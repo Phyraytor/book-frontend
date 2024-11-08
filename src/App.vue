@@ -1,30 +1,41 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
+<!--  <router-link to="/">Логотип</router-link>-->
   <router-view/>
 </template>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+  div:focus {outline:none!important;}
+  body, html {
+    margin: 0;
+    padding: 0;
+  }
 
-nav {
-  padding: 30px;
-}
+  .input {
+    width: calc(100% - 16px);
+    margin-bottom: 16px;
+    height: 32px;
+    border: 1px solid #d2d2d2;
+    border-radius: 5px;
+    padding: 4px 8px;
+  }
 
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
+  .button {
+    align-self: flex-end;
+    cursor: pointer;
+    height: 44px;
+    padding: 0 24px;
+    border-radius: 12px;
+    background: #4285f5;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 110%;
+    border: none;
+    color: #fff;
+  }
 
-nav a.router-link-exact-active {
-  color: #42b983;
-}
+  input:focus, textarea:focus {
+    outline: none;
+  }
 </style>
+<script setup lang="ts">
+</script>
