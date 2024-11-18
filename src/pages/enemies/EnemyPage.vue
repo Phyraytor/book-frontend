@@ -1,89 +1,59 @@
 <template>
-  <div class="head">
-    <router-link :to="`/games/${gameId}`" class="back game__persons">
-      <icon-back />
-    </router-link>
-    <div class="content flex">
+  <PageLayout>
+    <template #header>
       <input v-if="enemy && isEdit" v-model="enemy.name" type="text" class="input__title">
       <h1 v-if="enemy && !isEdit" class="title">{{ enemy.name || 'Имя не задано' }}</h1>
       <icon-save v-if="isEdit" :click="updateEnemy" />
       <icon-pencil v-else :click="editEnemy" />
-    </div>
-    <div class="buttons game__persons">
-      <icon-remove :click="removeEnemy" />
-    </div>
-  </div>
-  <div class="main">
-    <div v-if="enemy" class="game__description">
-      <div class="steps__title">
-        <span>Способности</span>
-        <icon-plus :click="createSpell" />
+    </template>
+    <template #sidebarLeft>
+      <sidebar-block-spells :items="enemy.spells" />
+    </template>
+    <template #description>
+      <textarea v-if="isEdit" v-model="enemy.description" class="description textarea" />
+      <div v-else class="description">
+        {{ enemy.description || 'Описание не задано' }}
       </div>
-      <ul class="steps">
-        <li v-for="spell in enemy.spells" :key="spell.id">
-          <router-link :to="`/games/${gameId}/enemies/${id}/spells/${spell.id}`" class="person__link">
-            {{ spell.name || 'Имя не задано' }}
-          </router-link>
-        </li>
-      </ul>
-    </div>
-    <div class="content">
-      <download-sound v-if="false" />
-      <div class="game__description" v-if="enemy">
-        <textarea v-if="isEdit" v-model="enemy.description" class="description textarea" />
-        <div v-else class="description">
-          {{ enemy.description || 'Описание не задано' }}
-        </div>
-      </div>
-      <div v-if="false">
-        <input v-model="find" type="text" placeholder="ассет">
-      </div>
-      <create-asset-from v-if="false" :append="addAssets" />
-    </div>
-    <div class="game__description">
+    </template>
+    <template #sidebarRight>
       <download-image
         v-if="enemy"
         :enemy-id="enemy?.id"
         :image="image"
         :upload="uploadFile"
       />
-    </div>
-  </div>
+    </template>
+  </PageLayout>
 </template>
 <script>
 import { useRoute, useRouter } from 'vue-router'
 import { onMounted, ref, computed } from 'vue'
-import CreateAssetFrom from '@/components/CreateAssetFrom.vue'
-import DownloadSound from '@/components/UI/DownloadSound.vue'
 import IconSave from '@/components/assets/svg/IconSave'
 import IconPencil from '@/components/assets/svg/IconPencil'
-import IconRemove from '@/components/assets/svg/IconRemove'
-import IconPlus from '@/components/assets/svg/IconPlus'
-import IconBack from '@/components/assets/svg/IconBack'
 import DownloadImage from '@/components/UI/DownloadImage'
+import PageLayout from '@/layouts/PageLayout'
+import SidebarBlockSpells from '@/components/Sidebar/SidebarBlockSpells'
 
 const API = 'http://localhost:3030'
 export default {
   name: 'EnemyPage',
   components: {
     DownloadImage,
-    CreateAssetFrom,
-    DownloadSound,
     IconSave,
     IconPencil,
-    IconBack,
-    IconPlus,
-    IconRemove
+    PageLayout,
+    SidebarBlockSpells
   },
   setup () {
     const assets = ref([])
-    const enemy = ref(null)
+    const enemy = ref({})
     const find = ref('')
     const isEdit = ref(false)
     const router = useRouter()
     const route = useRoute()
-    const id = route.params.id
+    const id = route.params.enemyId
     const gameId = route.params.gameId
+    const worldId = route.params.worldId
 
     const image = computed(() => API + enemy.value.imagePath)
     const addAssets = (asset) => assets.value.push(asset)
@@ -164,6 +134,7 @@ export default {
     })
     return {
       id,
+      worldId,
       gameId,
       enemy,
       removeEnemy,

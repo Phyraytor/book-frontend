@@ -1,20 +1,12 @@
 <template>
-  <div class="head">
-    <router-link :to="`/games/${gameId}/steps/${stepId}`" class="back game__persons">
-      <icon-back />
-    </router-link>
-    <div class="content flex">
+  <PageLayout>
+    <template #header>
       <input v-if="message && isEdit" v-model="message.name" type="text" class="input__title">
       <h1 v-if="message && !isEdit" class="title">{{ message.name || 'Имя не задано' }}</h1>
       <icon-save v-if="isEdit" :click="updateMessage" />
       <icon-pencil v-else :click="editMessage" />
-    </div>
-    <div class="buttons game__persons">
-      <icon-remove :click="removeMessage" />
-    </div>
-  </div>
-  <div class="main">
-    <div class="game__description">
+    </template>
+    <template #sidebarLeft>
       <div class="steps__title">
         <span>Переводы</span>
       </div>
@@ -28,23 +20,21 @@
           {{ language.name }}
         </li>
       </ul>
-    </div>
-    <div class="content">
-      <div class="game__description" v-if="message">
-        <textarea
-          v-if="isEdit"
-          v-model="description"
-          class="description textarea"
-        />
-        <div v-else class="description">
-          {{ description }}
-        </div>
+    </template>
+    <template #description>
+      <textarea
+        v-if="isEdit"
+        v-model="description"
+        class="description textarea"
+      />
+      <div v-else class="description">
+        {{ description }}
       </div>
-    </div>
-    <div  class="game__description">
+    </template>
+    <template #sidebarRight>
       <download-sound v-if="note" :audio="audio" :upload="uploadFile" />
-    </div>
-  </div>
+    </template>
+  </PageLayout>
 </template>
 <script>
 import { useRoute, useRouter } from 'vue-router'
@@ -52,8 +42,7 @@ import { onMounted, ref, computed } from 'vue'
 import DownloadSound from '@/components/UI/DownloadSound.vue'
 import IconSave from '@/components/assets/svg/IconSave'
 import IconPencil from '@/components/assets/svg/IconPencil'
-import IconRemove from '@/components/assets/svg/IconRemove'
-import IconBack from '@/components/assets/svg/IconBack'
+import PageLayout from '@/layouts/PageLayout'
 
 const API = 'http://localhost:3030'
 export default {
@@ -62,8 +51,7 @@ export default {
     DownloadSound,
     IconSave,
     IconPencil,
-    IconBack,
-    IconRemove
+    PageLayout
   },
   setup () {
     const languages = ref([])
@@ -75,9 +63,10 @@ export default {
     const indexActiveLanguage = ref(0)
     const router = useRouter()
     const route = useRoute()
-    const id = route.params.id
+    const id = route.params.messageId
     const gameId = route.params.gameId
     const stepId = route.params.stepId
+    const worldId = route.params.worldId
 
     const languageId = computed(() => languages.value?.[indexActiveLanguage.value]?.id)
     const note = computed(() => message.value?.notes?.find(note => note.language.id === languageId.value))
@@ -212,6 +201,7 @@ export default {
       indexActiveLanguage,
       setActiveLanguage,
       languages,
+      worldId,
       gameId,
       stepId,
       message,

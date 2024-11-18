@@ -4,10 +4,10 @@
     <p>Браузер не поддерживает аудио</p>
   </audio>
   <div v-else>
-    <div class="image" @click="openUploader">
+    <div class="audio" @click="openUploader">
       Загрузить аудиофайл
     </div>
-    <input type="file" class="input" @change="onFileChange" ref="inputRef"/>
+    <input type="file" class="hidden" @change="onFileChange" ref="inputRef"/>
   </div>
 </template>
 <script>
@@ -34,8 +34,8 @@ export default {
   }
 }
 </script>
-<style scoped>
-.image {
+<style>
+.audio {
   width: 100%;
   height: auto;
   cursor: pointer;
@@ -47,7 +47,7 @@ export default {
   color: #fff;
 }
 
-.input {
+.hidden {
   display: none;
 }
 </style>

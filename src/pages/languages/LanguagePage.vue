@@ -1,15 +1,9 @@
 <template>
-  <div class="head">
-    <router-link :to="`/games/${gameId}`" class="back game__persons">
-      <icon-back />
-    </router-link>
-    <div class="content flex">
+  <PageLayout>
+    <template #header>
       <h1 class="title">Языки</h1>
-    </div>
-    <div class="game__persons"/>
-  </div>
-  <div class="main">
-    <div class="content">
+    </template>
+    <template #description>
       <div class="language__form">
         <input v-model="name" type="text" class="language__input">
         <icon-plus :click="createLanguage" />
@@ -17,24 +11,25 @@
       <div v-for="language in languages" :key="language.name" class="language__item">
         {{ language.name }}
       </div>
-    </div>
-  </div>
+    </template>
+  </PageLayout>
 </template>
 
 <script>
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router/dist/vue-router'
-import IconBack from '@/components/assets/svg/IconBack'
 import IconPlus from '@/components/assets/svg/IconPlus'
+import PageLayout from '@/layouts/PageLayout'
 const API = 'http://localhost:3030'
 export default {
   name: 'LanguagePage',
-  components: { IconBack, IconPlus },
+  components: { IconPlus, PageLayout },
   setup () {
     const name = ref('')
     const languages = ref([])
     const route = useRoute()
     const gameId = route.params.id
+    const worldId = route.params.worldId
 
     const getLanguage = async () => {
       const response = await fetch(`${API}/languages/${gameId}`, {
@@ -78,6 +73,7 @@ export default {
       createLanguage,
       languages,
       gameId,
+      worldId,
       name
     }
   }

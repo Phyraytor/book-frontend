@@ -29,7 +29,7 @@ export default {
     const asset = ref({})
     const router = useRouter()
     const route = useRoute()
-    const id = route.params.id
+    const id = route.params.assetId
     const getAsset = async () => {
       const response = await fetch(`${API}/assets/${id}`)
       if (!response.ok) {

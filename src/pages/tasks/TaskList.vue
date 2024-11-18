@@ -1,27 +1,26 @@
 <template>
   <div class="head">
-    <router-link :to="`/`" class="back game__persons">
+    <router-link :to="`/worlds/${worldId}/games/${gameId}`" class="back task__persons">
       <icon-back />
     </router-link>
     <div class="content head__content">
-      <h1 class="title">Список игр</h1>
-      <icon-plus :click="createGame" />
+      <h1 class="title">Список Задач</h1>
     </div>
-    <div class="buttons game__persons" />
+    <div class="buttons task__persons" />
   </div>
-  <div class="games">
-    <ul class="games-list">
+  <div class="tasks">
+    <ul class="tasks-list">
       <li
-        v-for="(game, index) in games"
-        class="games-list__item"
-        :key="game.id"
+        v-for="(task, index) in tasks"
+        class="tasks-list__item"
+        :key="task.id"
       >
-        <router-link class="games-list__link" :to="`/${worldId}/games/${game.id}`">
-          <span class="game-index">{{ index + 1 }}</span>
-          <span class="game-text">{{ game.name }}</span>
+        <router-link class="tasks-list__link" :to="`/worlds/${worldId}/games/${gameId}/tasks/${task.id}`">
+          <span class="task-index">{{ index + 1 }}</span>
+          <span class="task-text">{{ task.title }}</span>
           <div class="buttons">
-            <icon-mobile v-if="game.isMobile" :click="createGame" />
-            <icon-online v-if="game.isOnline" :click="createGame" />
+            <icon-mobile v-if="task.isMobile" :click="createTask" />
+            <icon-online v-if="task.isOnline" :click="createTask" />
           </div>
         </router-link>
       </li>
@@ -30,72 +29,51 @@
 </template>
 <script>
 import { ref, onMounted, computed } from 'vue'
-import IconPlus from '@/components/assets/svg/IconPlus'
 import IconOnline from '@/components/assets/svg/IconOnline'
 import IconMobile from '@/components/assets/svg/IconMobile'
 import IconBack from '@/components/assets/svg/IconBack'
-import { useRouter } from 'vue-router/dist/vue-router'
+import { useRoute } from 'vue-router/dist/vue-router'
 const API = 'http://localhost:3030'
 export default {
-  name: 'GameList',
-  components: { IconPlus, IconOnline, IconMobile, IconBack },
+  name: 'TaskList',
+  components: { IconOnline, IconMobile, IconBack },
   setup () {
-    const router = useRouter()
-    const games = ref([])
+    const route = useRoute()
+    const tasks = ref([])
+    const gameId = route.params.gameId
+    const worldId = route.params.worldId
     const ages = computed(() => {
       const result = []
-      const last = games.value?.[games.value.length - 1]?.age
+      const last = tasks.value?.[tasks.value.length - 1]?.age
       for (let i = 1; i <= last; i++) {
-        result.push(games.value.filter(game => game.age === i))
+        result.push(tasks.value.filter(task => task.age === i))
       }
       return result
     })
-    const getGames = async () => {
-      const response = await fetch(`${API}/games`)
+    const getTasks = async () => {
+      const response = await fetch(`${API}/tasks`)
       if (!response.ok) {
         console.log(`Ошибка HTTP: ${response.status}`)
         return
       }
-      games.value = await response.json()
-    }
-
-    const createGame = async () => {
-      const response = await fetch(`${API}/games`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8'
-        },
-        body: JSON.stringify({
-          planes: '',
-          sources: '',
-          notices: '',
-          story: '',
-          name: '',
-          description: ''
-        })
-      })
-      if (!response.ok) {
-        console.log(`Ошибка HTTP: ${response.status}`)
-        return
-      }
-      const game = await response.json()
-      router.push({ name: 'games-page', params: { id: game.id } })
+      tasks.value = await response.json()
     }
 
     onMounted(() => {
-      getGames()
+      getTasks()
     })
 
     return {
       ages,
-      games,
-      createGame
+      tasks,
+      gameId,
+      worldId
     }
   }
 }
 </script>
 <style>
-  .game-index {
+  .task-index {
     padding: 0;
     width: 72px;
     height: 72px;
@@ -104,23 +82,23 @@ export default {
     justify-content: center;
     border-right: 1px solid #e7e8ec;
   }
-  .game-text {
+  .task-text {
     padding: 0;
     padding-left: 12px;
   }
-  .game {
+  .task {
     background: #fff;
   }
 
-  .game_mobile {
+  .task_mobile {
     background: #a5a27f;
   }
 
-  .game_online {
+  .task_online {
     background: #e7e1b1;
   }
 
-  .game_mobile_online {
+  .task_mobile_online {
     background: #0f637f;
   }
   .age {
@@ -130,7 +108,7 @@ export default {
     margin-bottom: 32px;
   }
 
-  .games {
+  .tasks {
     margin: 0 auto;
     width: 1000px;
     border-left: 1px solid #e7e8ec;
@@ -138,7 +116,7 @@ export default {
     min-height: calc(100vh - 96px);
   }
 
-  .games-list {
+  .tasks-list {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -147,13 +125,13 @@ export default {
     margin: 0;
   }
 
-  .games-list__item {
+  .tasks-list__item {
     width: 100%;
     font-size: 24px;
     border-bottom: 1px solid #eaeaef;
   }
 
-  .games-list__link {
+  .tasks-list__link {
     color: #000;
     text-decoration: none;
     width: 100%;
@@ -163,13 +141,13 @@ export default {
     align-items: center;
   }
 
-  .games-list__link img {
+  .tasks-list__link img {
     width: 24px;
     margin-left: 8px;
     height: auto;
   }
 
-  .games-list__link:hover {
+  .tasks-list__link:hover {
     background: #303841;
     color: #fff;
   }

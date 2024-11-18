@@ -1,6 +1,6 @@
 <template>
   <div class="head">
-    <router-link :to="`/games/${gameId}`" class="back game__subjects">
+    <router-link :to="`/worlds/${worldId}/games/${gameId}`" class="back game__subjects">
       <icon-back />
     </router-link>
     <div class="content flex">
@@ -52,8 +52,9 @@ export default {
     const isEdit = ref(false)
     const router = useRouter()
     const route = useRoute()
-    const id = route.params.id
+    const id = route.params.pageId
     const gameId = route.params.gameId
+    const worldId = route.params.worldId
     const audio = computed(() => subject.value?.sound?.path && (API + subject.value?.sound?.path))
     const addAssets = (asset) => assets.value.push(asset)
     const editSubject = () => {
@@ -113,6 +114,7 @@ export default {
       audio,
       uploadFile,
       subject,
+      worldId,
       gameId,
       removeSubject,
       assets,

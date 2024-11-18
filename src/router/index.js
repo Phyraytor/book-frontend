@@ -1,4 +1,4 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 import GamePage from '@/pages/games/GamePage'
 import StepPage from '@/pages/steps/StepPage'
 import PersonPage from '@/pages/persons/PersonPage'
@@ -13,6 +13,8 @@ import SoundsList from '@/pages/sounds/SoundsList'
 import SpellPage from '@/pages/spells/SpellPage'
 import WorldList from '@/pages/worlds/WorldList'
 import WorldPage from '@/pages/worlds/WorldPage'
+import TaskPage from '@/pages/tasks/TaskPage'
+import TaskList from '@/pages/tasks/TaskList'
 
 const routes = [
   {
@@ -21,77 +23,87 @@ const routes = [
     component: WorldList
   },
   {
-    path: '/worlds/:worldId/games/:id',
+    path: '/worlds/:worldId/games/:gameId',
     name: 'games-page',
     component: GamePage
   },
   {
-    path: '/games/:id/languages',
+    path: '/worlds/:worldId/games/:gameId/tasks/:taskId',
+    name: 'task-page',
+    component: TaskPage
+  },
+  {
+    path: '/worlds/:worldId/games/:gameId/tasks',
+    name: 'tasks-list',
+    component: TaskList
+  },
+  {
+    path: '/worlds/:worldId/games/:gameId/languages',
     name: 'languages-page',
     component: LanguagePage
   },
   {
-    path: '/games/:gameId/steps/:stepId/messages/:id',
+    path: '/worlds/:worldId/games/:gameId/steps/:stepId/messages/:messageId',
     name: 'message-page',
     component: MessagePage
   },
   {
-    path: '/worlds/:id',
+    path: '/worlds/:worldId',
     name: 'world-page',
     component: WorldPage
   },
   {
-    path: '/games/:gameId/steps/:id',
+    path: '/worlds/:worldId/games/:gameId/steps/:stepId',
     name: 'step-page',
     component: StepPage
   },
   {
-    path: '/games/:gameId/subjects/:id',
+    path: '/worlds/:worldId/games/:gameId/subjects/:subjectId',
     name: 'subject-page',
     component: SubjectPage
   },
   {
-    path: '/games/:gameId/sounds',
+    path: '/sounds',
     name: 'sounds-list',
     component: SoundsList
   },
   {
-    path: '/games/:gameId/sounds/:id',
+    path: '/sounds/:soundId',
     name: 'sound-page',
     component: SoundPage
   },
   {
-    path: '/games/:gameId/persons/:id',
+    path: '/worlds/:worldId/games/:gameId/persons/:personId',
     name: 'person-page',
     component: PersonPage
   },
   {
-    path: '/games/:gameId/persons/:personId/spells/:id',
-    name: 'spell-page',
+    path: '/worlds/:worldId/games/:gameId/persons/:personId/spells/:spellId',
+    name: 'spell-person-page',
     component: SpellPage
   },
   {
-    path: '/games/:gameId/enemies/:enemyId/spells/:id',
+    path: '/worlds/:worldId/games/:gameId/enemies/:enemyId/spells/:spellId',
     name: 'spell-enemy-page',
     component: SpellPage
   },
   {
-    path: '/games/:gameId/enemies/:id',
+    path: '/worlds/:worldId/games/:gameId/enemies/:enemyId',
     name: 'enemy-page',
     component: EnemyPage
   },
   {
-    path: '/assets',
+    path: '/worlds/:worldId/assets',
     name: 'assets',
     component: AssetList
   },
   {
-    path: '/assets/:id',
+    path: '/assets/:assetId',
     name: 'asset-page',
     component: AssetPage
   }
 ]
 export default createRouter({
-  history: createWebHashHistory(),
+  history: createWebHistory(),
   routes
 })

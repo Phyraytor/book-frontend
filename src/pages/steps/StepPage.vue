@@ -1,70 +1,68 @@
 <template>
-  <div v-if="step" class="head">
-    <router-link :to="`/games/${step?.game?.id}`" class="back game__persons">
-      <icon-back />
-    </router-link>
-    <div class="content flex">
+  <PageLayout>
+    <template #header>
       <input v-if="isEdit" v-model="step.name" type="text" class="input__title">
       <h1 v-else class="title">{{ step.name || 'Имя не задано' }}</h1>
       <icon-save v-if="isEdit" :click="update" />
       <icon-pencil v-else :click="edit" />
-    </div>
-    <div class="buttons game__persons">
-      <icon-remove :click="remove" />
-    </div>
-  </div>
-  <div class="main">
-    <div class="game__description">
-      <div class="steps__title">
-        <span>Записки</span>
-        <icon-plus :click="createMessage" />
+    </template>
+    <template #sidebarLeft>
+      <sidebar-block-messages :items="step.messages"/>
+    </template>
+    <template #description>
+      <textarea v-if="isEdit" v-model="step.description" class="description textarea" />
+      <div v-else class="description">
+        {{ step.description }}
       </div>
-      <ul class="steps">
-        <li v-for="message in step.messages" :key="message.id">
-          <router-link :to="`/games/${gameId}/steps/${step.id}/messages/${message.id}`" class="person__link">
-            {{ message.name || 'Имя не задано' }}
-          </router-link>
-        </li>
-      </ul>
-    </div>
-    <div v-if="step" class="content">
-      <div class="game__description">
-        <textarea v-if="isEdit" v-model="step.description" class="description textarea" />
-        <div v-else class="description">
-          {{ step.description }}
-        </div>
-      </div>
-    </div>
-    <div class="game__description">
+    </template>
+    <template #sidebarRight>
       <download-image
         v-if="step"
-        :enemy-id="step?.id"
         :image="image"
         :upload="uploadFile"
       />
-    </div>
-  </div>
+      <ul class="step-sounds">
+        <li
+          v-for="sound in step.sounds"
+          :key="sound.id"
+          class="step-sounds__item"
+        >
+          <audio controls>
+            <source :src="getSound(sound.path)" type="audio/mpeg">
+            <p>Браузер не поддерживает аудио</p>
+          </audio>
+          <router-link :to="`/sounds/${sound.id}`" class="sidebar__link">
+            {{ sound.name || 'Имя не задано' }}
+          </router-link>
+        </li>
+      </ul>
+      <download-sound
+        v-if="step"
+        :upload="uploadSoundFile"
+      />
+    </template>
+  </PageLayout>
 </template>
 <script>
 import { useRoute, useRouter } from 'vue-router'
 import { computed, onMounted, ref } from 'vue'
-import IconBack from '@/components/assets/svg/IconBack'
 import IconSave from '@/components/assets/svg/IconSave'
 import IconPencil from '@/components/assets/svg/IconPencil'
-import IconRemove from '@/components/assets/svg/IconRemove'
 import DownloadImage from '@/components/UI/DownloadImage'
-import IconPlus from '@/components/assets/svg/IconPlus'
+import DownloadSound from '@/components/UI/DownloadSound'
+import PageLayout from '@/layouts/PageLayout'
+import SidebarBlockMessages from '@/components/Sidebar/SidebarBlockMessages'
 
 const API = 'http://localhost:3030'
 export default {
   name: 'StepPage',
   components: {
+    SidebarBlockMessages,
+    DownloadSound,
     DownloadImage,
-    IconBack,
     IconSave,
     IconPencil,
-    IconPlus,
-    IconRemove
+    PageLayout
   },
   setup () {
     const assets = ref([])
@@ -73,13 +71,16 @@ export default {
     const isEdit = ref(false)
     const router = useRouter()
     const route = useRoute()
-    const id = route.params.id
+    const id = route.params.stepId
+    const worldId = route.params.worldId
     const gameId = route.params.gameId
     const image = computed(() => API + step.value.imagePath)
     const addAssets = (asset) => assets.value.push(asset)
     const edit = () => {
       isEdit.value = true
     }
+
+    const getSound = (sound) => sound ? API + sound : ''
 
     const uploadFile = async (formData) => {
       const response = await fetch(`${API}/steps/${step.value.id}/upload`, {
@@ -88,6 +89,16 @@ export default {
       })
       const data = await response.json()
       step.value.imagePath = data.path
+    }
+
+    const uploadSoundFile = async (formData) => {
+      const response = await fetch(`${API}/steps/${step.value.id}/upload-sound`, {
+        method: 'POST',
+        body: formData
+      })
+      const sound = await response.json()
+      step.value.sounds.push(sound)
+      console.log(step.value.sounds)
     }
 
     const getStep = async () => {
@@ -128,31 +139,14 @@ export default {
       }
       isEdit.value = false
     }
-
-    const createMessage = async () => {
-      const response = await fetch(`${API}/messages`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8'
-        },
-        body: JSON.stringify({
-          name: '',
-          stepId: id
-        })
-      })
-      if (!response.ok) {
-        console.log(`Ошибка HTTP: ${response.status}`)
-        return
-      }
-      const message = await response.json()
-      router.push({ name: 'message-page', params: { gameId, stepId: id, id: message.id } })
-    }
     onMounted(() => {
       getStep()
     })
     return {
-      createMessage,
+      getSound,
+      uploadSoundFile,
       image,
+      worldId,
       step,
       gameId,
       remove,
@@ -171,5 +165,25 @@ export default {
   .actions {
     display: flex;
     gap: 16px;
+  }
+
+  .step-sounds__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .step-sounds__item a {
+    flex-grow: 1;
+    height: 40px;
+    justify-content: flex-end;
+    display: flex;
+    align-items: center;
+    padding-right: 16px;
+  }
+
+  .step-sounds__item a:hover {
+    background: #303841;
+    color: #fff;
   }
 </style>
