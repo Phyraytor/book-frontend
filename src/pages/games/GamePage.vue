@@ -280,7 +280,7 @@ export default {
   .description {
     white-space: pre-line;
     text-align: left;
-    min-height: calc(100vh - 141px);
+    min-height: calc(100vh - 97px);
     font-size: 16px;
     width: calc(100% - 24px);
     padding: 12px;

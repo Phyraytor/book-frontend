@@ -4,12 +4,14 @@
       <h1 class="title">Языки</h1>
     </template>
     <template #description>
-      <div class="language__form">
-        <input v-model="name" type="text" class="language__input">
-        <icon-plus :click="createLanguage" />
-      </div>
-      <div v-for="language in languages" :key="language.name" class="language__item">
-        {{ language.name }}
+      <div class="language__list">
+        <div class="language__form">
+          <input v-model="name" type="text" class="language__input">
+          <icon-plus :click="createLanguage" />
+        </div>
+        <div v-for="language in languages" :key="language.name" class="language__item">
+          {{ language.name }}
+        </div>
       </div>
     </template>
   </PageLayout>
@@ -28,11 +30,11 @@ export default {
     const name = ref('')
     const languages = ref([])
     const route = useRoute()
-    const gameId = route.params.id
+    const gameId = route.params.gameId
     const worldId = route.params.worldId
 
     const getLanguage = async () => {
-      const response = await fetch(`${API}/languages/${gameId}`, {
+      const response = await fetch(`${API}/languages?gameId=${gameId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json;charset=utf-8'
@@ -81,9 +83,22 @@ export default {
 </script>
 
 <style scoped>
+  .language__list {
+    white-space: pre-line;
+    text-align: left;
+    min-height: calc(100vh - 97px);
+    font-size: 16px;
+    width: 100%;
+    resize: none;
+    border: none;
+    font-family: Georgia, serif;
+    margin: 0;
+  }
   .language__form {
     display: flex;
     height: 72px;
+    width: 100%;
+    border-bottom: 1px solid #e7e8ec;
   }
 
   .language__input {

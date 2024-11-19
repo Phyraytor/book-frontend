@@ -7,7 +7,7 @@
       <icon-pencil v-else :click="editMessage" />
     </template>
     <template #sidebarLeft>
-      <div class="steps__title">
+      <div class="language__title">
         <span>Переводы</span>
       </div>
       <ul class="language">
@@ -17,7 +17,7 @@
           :class="`language__item ${index === indexActiveLanguage ? 'language__itemActive' : ''}`"
           @click="setActiveLanguage(index)"
         >
-          {{ language.name }}
+          <span>{{ language.name }}</span>
         </li>
       </ul>
     </template>
@@ -63,7 +63,7 @@ export default {
     const indexActiveLanguage = ref(0)
     const router = useRouter()
     const route = useRoute()
-    const id = route.params.messageId
+    const messageId = route.params.messageId
     const gameId = route.params.gameId
     const stepId = route.params.stepId
     const worldId = route.params.worldId
@@ -73,12 +73,13 @@ export default {
     const audio = computed(() => note.value?.sound?.path && (API + note.value?.sound?.path))
     const addAssets = (asset) => assets.value.push(asset)
     const setActiveLanguage = (index) => {
+      console.log(languageId.value, note.value?.content)
       indexActiveLanguage.value = index
       description.value = note.value?.content || ''
     }
 
     const getLanguage = async () => {
-      const response = await fetch(`${API}/languages/${gameId}`, {
+      const response = await fetch(`${API}/languages?gameId=${gameId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json;charset=utf-8'
@@ -89,6 +90,7 @@ export default {
         return
       }
       languages.value = await response.json()
+      getMessage()
     }
 
     const editMessage = () => {
@@ -105,15 +107,16 @@ export default {
     }
 
     const getMessage = async () => {
-      const response = await fetch(`${API}/messages/${id}`)
+      const response = await fetch(`${API}/messages/${messageId}`)
       if (!response.ok) {
         console.log(`Ошибка HTTP: ${response.status}`)
         return
       }
       message.value = await response.json()
+      setActiveLanguage(0)
     }
     const removeMessage = async () => {
-      const response = await fetch(`${API}/messages/${id}`, {
+      const response = await fetch(`${API}/messages/${messageId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json;charset=utf-8'
@@ -127,7 +130,7 @@ export default {
     }
 
     const updateMessageName = async () => {
-      const response = await fetch(`${API}/messages/${id}`, {
+      const response = await fetch(`${API}/messages/${messageId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json;charset=utf-8'
@@ -194,7 +197,6 @@ export default {
 
     onMounted(() => {
       getLanguage()
-      getMessage()
     })
     return {
       changeNote,
@@ -221,6 +223,18 @@ export default {
 }
 </script>
 <style>
+.language__title {
+  border-bottom: 1px solid #e7e8ec;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0;
+  font-size: 18px;
+  font-weight: bold;
+  gap: 12px;
+  padding-left: 12px;
+  height: 72px;
+}
 .language__item {
   padding: 12px;
   padding-right: 0;

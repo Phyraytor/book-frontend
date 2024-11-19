@@ -39,7 +39,7 @@ export default {
         return
       }
       const message = await response.json()
-      router.push({ name: 'message-page', params: { gameId, stepId, id: message.id } })
+      router.push({ name: 'message-page', params: { gameId, stepId, messageId: message.id } })
     }
     return {
       createMessage
