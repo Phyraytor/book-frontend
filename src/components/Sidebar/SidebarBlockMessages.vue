@@ -7,10 +7,10 @@
   />
 </template>
 
-<script>
-import SidebarBlock from '@/components/Sidebar/SidebarBlock'
+<script lang="ts">
+import SidebarBlock from '@/components/Sidebar/SidebarBlock.vue'
 import { useRoute, useRouter } from 'vue-router/dist/vue-router'
-const API = 'http://localhost:3030'
+import QueryMessages from '@/queries/message'
 
 export default {
   name: 'SidebarBlockMessages',
@@ -24,21 +24,10 @@ export default {
     const gameId = route.params.gameId
     const stepId = route.params.stepId
     const createMessage = async () => {
-      const response = await fetch(`${API}/messages`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8'
-        },
-        body: JSON.stringify({
-          name: '',
-          stepId
-        })
+      const message = await QueryMessages.$post({
+        name: '',
+        stepId: +stepId
       })
-      if (!response.ok) {
-        console.log(`Ошибка HTTP: ${response.status}`)
-        return
-      }
-      const message = await response.json()
       router.push({ name: 'message-page', params: { gameId, stepId, messageId: message.id } })
     }
     return {

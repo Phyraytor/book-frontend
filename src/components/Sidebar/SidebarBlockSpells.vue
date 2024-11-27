@@ -7,10 +7,11 @@
   />
 </template>
 
-<script>
-import SidebarBlock from '@/components/Sidebar/SidebarBlock'
+<script lang="ts">
 import { useRoute, useRouter } from 'vue-router/dist/vue-router'
-const API = 'http://localhost:3030'
+import SidebarBlock from '@/components/Sidebar/SidebarBlock.vue'
+import QueryTasks from '@/queries/task'
+import { ITaskCreate } from '@/interfaces/task'
 
 export default {
   name: 'SidebarBlockSpells',
@@ -26,29 +27,18 @@ export default {
     const enemyId = route.params.enemyId
 
     const createSpell = async () => {
-      const params = {
-        name: '',
+      const params: ITaskCreate = {
+        title: '',
         description: ''
       }
       if (personId) {
-        params.personId = personId
+        params.personId = +personId
       }
       if (enemyId) {
-        params.enemyId = enemyId
+        params.enemyId = +enemyId
       }
-      const response = await fetch(`${API}/spells`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8'
-        },
-        body: JSON.stringify(params)
-      })
-      if (!response.ok) {
-        console.log(`Ошибка HTTP: ${response.status}`)
-        return
-      }
-      const spell = await response.json()
-      const routerParams = { gameId, spellId: spell.id }
+      const spell = await QueryTasks.$post(params)
+      const routerParams: any = { gameId, spellId: spell.id }
       if (personId) {
         routerParams.personId = personId
       }

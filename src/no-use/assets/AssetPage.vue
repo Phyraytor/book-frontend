@@ -19,10 +19,9 @@
     </div>
   </div>
 </template>
-<script>
+<script lang="ts">
 import { useRoute, useRouter } from 'vue-router'
 import { onMounted, ref } from 'vue'
-const API = 'http://localhost:3030'
 export default {
   name: 'StepPage',
   setup () {
@@ -31,7 +30,7 @@ export default {
     const route = useRoute()
     const id = route.params.assetId
     const getAsset = async () => {
-      const response = await fetch(`${API}/assets/${id}`)
+      const response = await fetch(`${process.env.VUE_APP_API_URL}/assets/${id}`)
       if (!response.ok) {
         console.log(`Ошибка HTTP: ${response.status}`)
         return
@@ -39,7 +38,7 @@ export default {
       asset.value = await response.json()
     }
     const remove = async () => {
-      const response = await fetch(`${API}/assets/${id}`, {
+      const response = await fetch(`${process.env.VUE_APP_API_URL}/assets/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json;charset=utf-8'

@@ -2,16 +2,16 @@
   <img class="image" :src="image" alt="Загрузить изображание" @click="openUploader" />
   <input type="file" class="input" @change="onFileChange" ref="inputRef" />
 </template>
-<script>
+<script lang="ts">
 import { ref } from 'vue'
 
 export default {
   name: 'DownloadImage',
   props: ['image', 'upload'],
-  setup (props) {
-    const inputRef = ref(null)
+  setup (props: any) {
+    const inputRef = ref<HTMLInputElement | null>(null)
     const openUploader = () => inputRef.value?.click?.()
-    const onFileChange = (event) => {
+    const onFileChange = (event: any) => {
       const file = event.target.files[0]
       const formData = new FormData()
       formData.append('file', file, file?.name)

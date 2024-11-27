@@ -22,11 +22,12 @@
   </sidebar-block>
 </template>
 
-<script>
-import SidebarBlock from '@/components/Sidebar/SidebarBlock'
+<script lang="ts">
+import SidebarBlock from '@/components/Sidebar/SidebarBlock.vue'
 import { useRoute, useRouter } from 'vue-router/dist/vue-router'
 import { onMounted, ref } from 'vue'
-const API = 'http://localhost:3030'
+import { IStep } from '@/interfaces/step'
+import QuerySteps from '@/queries/step'
 
 export default {
   name: 'SidebarBlockSteps',
@@ -36,72 +37,47 @@ export default {
   setup () {
     const router = useRouter()
     const route = useRoute()
-    const steps = ref([])
+    const steps = ref<IStep[]>([])
     const gameId = route.params.gameId
     const createStep = async () => {
-      const response = await fetch(`${API}/steps`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8'
-        },
-        body: JSON.stringify({
-          name: '',
-          description: '',
-          gameId
-        })
+      const step = await QuerySteps.$post({
+        name: '',
+        description: '',
+        gameId: +gameId
       })
-      if (!response.ok) {
-        console.log(`Ошибка HTTP: ${response.status}`)
-        return
-      }
-      const step = await response.json()
-      router.push({ name: 'step-page', params: { gameId, id: step.id } })
+      router.push({ name: 'step-page', params: { gameId, stepId: step.id } })
     }
 
     const sortSteps = () => {
-      if (steps.value) return
+      if (!steps.value) return
       steps.value.sort((x, y) => x.orderBy - y.orderBy)
     }
 
-    const getStep = async (gameId) => {
-      const response = await fetch(`${API}/steps?gameId=${gameId}`)
-      if (!response.ok) {
-        console.log(`Ошибка HTTP: ${response.status}`)
-        return
-      }
-      steps.value = await response.json()
+    const getStep = async (gameId: number) => {
+      steps.value = await QuerySteps.$getAll({ gameId })
       sortSteps()
     }
 
-    const updateStepOrder = async (stepId, orderBy) => {
-      const response = await fetch(`${API}/steps/${stepId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8'
-        },
-        body: JSON.stringify({
-          orderBy
-        })
+    const updateStepOrder = async (stepId: number, orderBy: number) => {
+      await QuerySteps.$patch(stepId, {
+        orderBy
       })
-      if (!response.ok) {
-        console.log(`Ошибка HTTP: ${response.status}`)
-      }
     }
 
-    const incStep = (step) => {
+    const incStep = (step: IStep) => {
       updateStepOrder(step.id, step.orderBy + 1)
       step.orderBy++
       sortSteps()
     }
 
-    const decStep = (step) => {
+    const decStep = (step: IStep) => {
       updateStepOrder(step.id, step.orderBy - 1)
       step.orderBy--
       sortSteps()
     }
 
     onMounted(() => {
-      getStep(gameId)
+      getStep(+gameId)
     })
 
     return {

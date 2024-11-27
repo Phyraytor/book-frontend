@@ -7,11 +7,12 @@
   />
 </template>
 
-<script>
-import SidebarBlock from '@/components/Sidebar/SidebarBlock'
+<script lang="ts">
+import SidebarBlock from '@/components/Sidebar/SidebarBlock.vue'
 import { useRoute, useRouter } from 'vue-router/dist/vue-router'
 import { onMounted, ref } from 'vue'
-const API = 'http://localhost:3030'
+import { ISubject } from '@/interfaces/subject'
+import QuerySubjects from '@/queries/subject'
 
 export default {
   name: 'SidebarBlockSubjects',
@@ -21,39 +22,23 @@ export default {
   setup () {
     const router = useRouter()
     const route = useRoute()
-    const subjects = ref([])
+    const subjects = ref<ISubject[]>([])
     const gameId = route.params.gameId
     const createSubject = async () => {
-      const response = await fetch(`${API}/subjects`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8'
-        },
-        body: JSON.stringify({
-          name: '',
-          description: '',
-          gameId
-        })
+      const subject = await await QuerySubjects.$post({
+        name: '',
+        description: '',
+        gameId
       })
-      if (!response.ok) {
-        console.log(`Ошибка HTTP: ${response.status}`)
-        return
-      }
-      const subject = await response.json()
-      router.push({ name: 'subject-page', params: { gameId, id: subject.id } })
+      router.push({ name: 'subject-page', params: { gameId, subjectId: subject.id } })
     }
 
-    const getSubject = async (gameId) => {
-      const response = await fetch(`${API}/subjects?gameId=${gameId}`)
-      if (!response.ok) {
-        console.log(`Ошибка HTTP: ${response.status}`)
-        return
-      }
-      subjects.value = await response.json()
+    const getSubject = async (gameId: number) => {
+      subjects.value = await QuerySubjects.$getAll({ gameId })
     }
 
     onMounted(() => {
-      getSubject(gameId)
+      getSubject(+gameId)
     })
 
     return {

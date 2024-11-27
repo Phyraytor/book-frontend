@@ -15,9 +15,8 @@
   </ul>
 </template>
 
-<script>
-import IconPlus from '@/components/assets/svg/IconPlus'
-const API = 'http://localhost:3030'
+<script lang="ts">
+import IconPlus from '@/components/assets/svg/IconPlus.vue'
 
 export default {
   name: 'SidebarBlock',
@@ -25,9 +24,9 @@ export default {
     IconPlus
   },
   props: ['title', 'create', 'items', 'type', 'keyImage'],
-  setup (props) {
-    const makeLink = (itemId) => `${window.location.pathname}/${props.type}/${itemId}`
-    const getImage = (image) => API + image
+  setup (props: any) {
+    const makeLink = (itemId: number) => `${window.location.pathname}/${props.type}/${itemId}`
+    const getImage = (image: string) => process.env.VUE_APP_API_URL + image
     return {
       makeLink,
       getImage
@@ -65,7 +64,6 @@ export default {
 }
 
 .sidebarImage {
-  background: #e7e8ec;
   display: flex;
   flex-wrap: wrap;
   gap: 1px;

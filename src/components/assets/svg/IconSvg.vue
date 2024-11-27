@@ -1,16 +1,15 @@
 <template>
-  <div :class="`icon ${props.className}`" @click="props.click">
+  <div :class="`icon ${className}`" @click="click">
     <slot />
   </div>
 </template>
 
-<script>
+<script lang="ts">
 export default {
   name: 'IconSvg',
   props: ['className', 'click'],
-  setup (props) {
+  setup () {
     return {
-      props
     }
   }
 }

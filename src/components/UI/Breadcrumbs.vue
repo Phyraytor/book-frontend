@@ -5,14 +5,14 @@
       <span class="breadcrumbs__next">></span>
     </li>
   </ul>
-  <router-link v-else to="/" class="back task__persons">
+  <router-link v-if="!items.length && !isHome" to="/" class="back task__persons">
     <icon-back />
   </router-link>
 </template>
 
-<script>
-import { ref } from 'vue'
-import IconBack from '@/components/assets/svg/IconBack'
+<script lang="ts">
+import { computed, ref } from 'vue'
+import IconBack from '@/components/assets/svg/IconBack.vue'
 
 export default {
   name: 'BreadCrumbs',
@@ -22,15 +22,17 @@ export default {
   setup () {
     // Todo: В идеале, нужно знать имена родителей, а для этого нужен особый запрос, который будет вытягивать только эти данные
     // Todo: Так что пока делаем такой костыль, а потом сделаем на беке один универсальный запрос, который будет возвращать нам объект Breadcrumbs
-    const items = ref([])
+    const items = ref<any[]>([])
     const TRANSLATE = {
       worlds: 'Мир',
       games: 'Игра',
       persons: 'Персонаж',
       spells: 'Умение',
-      steps: 'Шаг'
+      steps: 'Шаг',
+      articles: 'Статьи'
     }
     const path = window.location.pathname.split('/').filter(x => x)
+    const isHome = computed(() => window.location.pathname === '/')
     let currentLink = ''
     for (let i = 0; i < path.length - 2; i += 2) {
       const type = path[i]
@@ -40,12 +42,14 @@ export default {
         currentLink += `/${id}`
       }
       items.value.push({
+        // @ts-ignore
         name: TRANSLATE[type],
         link: currentLink
       })
     }
     return {
-      items
+      items,
+      isHome
     }
   }
 }

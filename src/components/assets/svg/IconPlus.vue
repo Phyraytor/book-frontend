@@ -1,8 +1,7 @@
 <template>
-  <icon-svg :class-name="props.className || ''" :click="click">
+  <icon-svg :class-name="className || ''" :click="click">
     <svg
-      width="800px" height="800px" viewBox="0 0 14 14" id="meteor-icon-kit__regular-plus-s" fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+      width="800px" height="800px" viewBox="0 0 14 14" fill="none"
     >
       <path
         fill-rule="evenodd" clip-rule="evenodd"
@@ -13,16 +12,15 @@
   </icon-svg>
 </template>
 
-<script>
-import IconSvg from './IconSvg'
+<script lang="ts">
+import IconSvg from '@/components/assets/svg/IconSvg.vue'
 
 export default {
   name: 'IconPlus',
   components: { IconSvg },
   props: ['className', 'click'],
-  setup (props) {
+  setup () {
     return {
-      props
     }
   }
 }

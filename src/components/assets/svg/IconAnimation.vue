@@ -1,5 +1,5 @@
 <template>
-  <icon-svg :class-name="props.className" :click="click">
+  <icon-svg :class-name="className" :click="click">
     <svg
       width="800px"
       height="800px"
@@ -13,16 +13,15 @@
   </icon-svg>
 </template>
 
-<script>
-import IconSvg from './IconSvg'
+<script lang="ts">
+import IconSvg from '@/components/assets/svg/IconSvg.vue'
 
 export default {
   name: 'IconAnimation',
   components: { IconSvg },
   props: ['className', 'click'],
-  setup (props) {
+  setup () {
     return {
-      props
     }
   }
 }

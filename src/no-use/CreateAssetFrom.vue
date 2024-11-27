@@ -7,9 +7,8 @@
     </button>
   </div>
 </template>
-<script>
+<script lang="ts">
 import { ref } from 'vue'
-const API = 'http://localhost:3030'
 export default {
   name: 'CreateAssetFrom',
   props: {
@@ -18,11 +17,11 @@ export default {
       required: true
     }
   },
-  setup (props) {
+  setup (props: any) {
     const name = ref('')
     const description = ref('')
     const create = async () => {
-      const response = await fetch(`${API}/assets`, {
+      const response = await fetch(`${process.env.VUE_APP_API_URL}/assets`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json;charset=utf-8'

@@ -10,16 +10,16 @@
     <input type="file" class="hidden" @change="onFileChange" ref="inputRef"/>
   </div>
 </template>
-<script>
+<script lang="ts">
 import { ref } from 'vue'
 
 export default {
   name: 'DownloadSound',
   props: ['audio', 'upload'],
-  setup (props) {
-    const inputRef = ref(null)
+  setup (props: any) {
+    const inputRef = ref<HTMLInputElement | null>(null)
     const openUploader = () => inputRef.value?.click?.()
-    const onFileChange = (event) => {
+    const onFileChange = (event: any) => {
       const file = event.target.files[0]
       const formData = new FormData()
       formData.append('file', file, file?.name)

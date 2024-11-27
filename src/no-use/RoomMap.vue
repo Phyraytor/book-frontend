@@ -27,7 +27,7 @@
     </div>
   </div>
 </template>
-<script>
+<script lang="ts">
 import { ref } from 'vue'
 
 const WIDTH = 945
@@ -91,11 +91,11 @@ export default {
       })
     }
 
-    const getCollisions = (value) => rooms.value.filter(room =>
+    const getCollisions = (value: any) => rooms.value.filter(room =>
       room !== value &&
       (room.top <= value.top + value.height ||
       room.top + room.height >= value.top))
-    const moveItemLeft = (i) => {
+    const moveItemLeft = (i: any) => {
       const maxRight = Math.max(
         ...getCollisions(rooms.value[i])
           .filter(room =>
@@ -105,7 +105,7 @@ export default {
       rooms.value[i].left = maxRight
     }
 
-    const moveItemRight = (i) => {
+    const moveItemRight = (i: any) => {
       const minLeft = Math.min(
         ...getCollisions(rooms.value[i])
           .filter(room =>
@@ -115,14 +115,14 @@ export default {
       console.log('minLeft', minLeft, getCollisions(rooms.value[i]))
       rooms.value[i].left = WIDTH - (rooms.value[i].width + minLeft)
     }
-    const moveItemTop = (i) => {
+    const moveItemTop = (i: any) => {
       rooms.value[i].top = 0
     }
-    const moveItemBottom = (i) => {
+    const moveItemBottom = (i: any) => {
       rooms.value[i].top = HEIGHT - rooms.value[i].top
     }
 
-    const move = (i) => {}
+    const move = (i: any) => {}
 
     return {
       rooms,

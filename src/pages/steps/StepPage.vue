@@ -1,6 +1,6 @@
 <template>
   <PageLayout>
-    <template #header>
+    <template v-if="step" #header>
       <input v-if="isEdit" v-model="step.name" type="text" class="input__title">
       <h1 v-else class="title">{{ step.name || 'Имя не задано' }}</h1>
       <icon-save v-if="isEdit" :click="update" />
@@ -9,13 +9,13 @@
     <template #sidebarLeft>
       <sidebar-block-messages :items="step.messages"/>
     </template>
-    <template #description>
+    <template v-if="step" #description>
       <textarea v-if="isEdit" v-model="step.description" class="description textarea" />
       <div v-else class="description">
         {{ step.description }}
       </div>
     </template>
-    <template #sidebarRight>
+    <template v-if="step" #sidebarRight>
       <download-image
         v-if="step"
         :image="image"
@@ -27,13 +27,11 @@
           :key="sound.id"
           class="step-sounds__item"
         >
-          <audio controls>
-            <source :src="getSound(sound.path)" type="audio/mpeg">
-            <p>Браузер не поддерживает аудио</p>
-          </audio>
-          <router-link :to="`/sounds/${sound.id}`" class="sidebar__link">
-            {{ sound.name || 'Имя не задано' }}
-          </router-link>
+          <sound-item
+            :id="sound.id"
+            :name="sound.name"
+            :path="getSound(sound.path)"
+          />
         </li>
       </ul>
       <download-sound
@@ -43,20 +41,24 @@
     </template>
   </PageLayout>
 </template>
-<script>
+<script lang="ts">
 import { useRoute, useRouter } from 'vue-router'
 import { computed, onMounted, ref } from 'vue'
-import IconSave from '@/components/assets/svg/IconSave'
-import IconPencil from '@/components/assets/svg/IconPencil'
-import DownloadImage from '@/components/UI/DownloadImage'
-import DownloadSound from '@/components/UI/DownloadSound'
-import PageLayout from '@/layouts/PageLayout'
-import SidebarBlockMessages from '@/components/Sidebar/SidebarBlockMessages'
+import { IStep } from '@/interfaces/step'
+import { ISound } from '@/interfaces/sound'
+import IconSave from '@/components/assets/svg/IconSave.vue'
+import IconPencil from '@/components/assets/svg/IconPencil.vue'
+import DownloadImage from '@/components/UI/DownloadImage.vue'
+import DownloadSound from '@/components/UI/DownloadSound.vue'
+import PageLayout from '@/layouts/PageLayout.vue'
+import SidebarBlockMessages from '@/components/Sidebar/SidebarBlockMessages.vue'
+import QuerySteps from '@/queries/step'
+import SoundItem from '@/components/UI/SoundItem.vue'
 
-const API = 'http://localhost:3030'
 export default {
   name: 'StepPage',
   components: {
+    SoundItem,
     SidebarBlockMessages,
     DownloadSound,
     DownloadImage,
@@ -65,25 +67,23 @@ export default {
     PageLayout
   },
   setup () {
-    const assets = ref([])
-    const step = ref({})
-    const find = ref('')
+    const step = ref<IStep | null>(null)
     const isEdit = ref(false)
     const router = useRouter()
     const route = useRoute()
-    const id = route.params.stepId
+    const stepId = route.params.stepId
     const worldId = route.params.worldId
     const gameId = route.params.gameId
-    const image = computed(() => API + step.value.imagePath)
-    const addAssets = (asset) => assets.value.push(asset)
+    const image = computed(() => step.value ? process.env.VUE_APP_API_URL + step.value.imagePath : '')
     const edit = () => {
       isEdit.value = true
     }
 
-    const getSound = (sound) => sound ? API + sound : ''
+    const getSound = (sound: ISound) => sound ? process.env.VUE_APP_API_URL + sound : ''
 
-    const uploadFile = async (formData) => {
-      const response = await fetch(`${API}/steps/${step.value.id}/upload`, {
+    const uploadFile = async (formData: FormData) => {
+      if (!step.value) return null
+      const response = await fetch(`${process.env.VUE_APP_API_URL}/steps/${stepId}/upload`, {
         method: 'POST',
         body: formData
       })
@@ -91,99 +91,56 @@ export default {
       step.value.imagePath = data.path
     }
 
-    const uploadSoundFile = async (formData) => {
-      const response = await fetch(`${API}/steps/${step.value.id}/upload-sound`, {
+    const uploadSoundFile = async (formData: FormData) => {
+      if (!step.value) return null
+      const response = await fetch(`${process.env.VUE_APP_API_URL}/steps/${stepId}/upload-sound`, {
         method: 'POST',
         body: formData
       })
       const sound = await response.json()
       step.value.sounds.push(sound)
-      console.log(step.value.sounds)
     }
 
     const getStep = async () => {
-      const response = await fetch(`${API}/steps/${id}`)
-      if (!response.ok) {
-        console.log(`Ошибка HTTP: ${response.status}`)
-        return
-      }
-      step.value = await response.json()
+      step.value = await QuerySteps.$get(+stepId)
     }
+
     const remove = async () => {
-      const response = await fetch(`${API}/steps/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8'
-        }
-      })
-      if (!response.ok) {
-        console.log(`Ошибка HTTP: ${response.status}`)
-        return
-      }
-      router.push({ name: 'home' })
+      await QuerySteps.$delete(+stepId)
+      router.push({ name: 'game-page', params: { worldId, gameId } })
     }
+
     const update = async () => {
-      const response = await fetch(`${API}/steps/${id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8'
-        },
-        body: JSON.stringify({
-          name: step.value.name,
-          description: step.value.description
-        })
+      if (!step.value) return null
+      await QuerySteps.$patch(+stepId, {
+        name: step.value.name,
+        description: step.value.description
       })
-      if (!response.ok) {
-        console.log(`Ошибка HTTP: ${response.status}`)
-        return
-      }
       isEdit.value = false
     }
+
     onMounted(() => {
       getStep()
     })
+
     return {
-      getSound,
-      uploadSoundFile,
       image,
-      worldId,
       step,
-      gameId,
-      remove,
-      assets,
-      find,
-      addAssets,
-      uploadFile,
       isEdit,
       edit,
-      update
+      update,
+      remove,
+      uploadFile,
+      getSound,
+      uploadSoundFile
     }
   }
 }
 </script>
-<style>
-  .actions {
-    display: flex;
-    gap: 16px;
-  }
-
+<style scoped>
   .step-sounds__item {
     display: flex;
     align-items: center;
     justify-content: space-between;
-  }
-
-  .step-sounds__item a {
-    flex-grow: 1;
-    height: 40px;
-    justify-content: flex-end;
-    display: flex;
-    align-items: center;
-    padding-right: 16px;
-  }
-
-  .step-sounds__item a:hover {
-    background: #303841;
-    color: #fff;
   }
 </style>

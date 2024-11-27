@@ -3,49 +3,50 @@
     title="Игры"
     type="games"
     :create="createGame"
-    :items="items"
+    :items="games"
   />
 </template>
 
-<script>
-import SidebarBlock from '@/components/Sidebar/SidebarBlock'
+<script lang="ts">
+import SidebarBlock from '@/components/Sidebar/SidebarBlock.vue'
 import { useRoute, useRouter } from 'vue-router/dist/vue-router'
-const API = 'http://localhost:3030'
+import { onMounted, ref } from 'vue'
+import { IGame } from '@/interfaces/games'
+import QueryGames from '@/queries/game'
 export default {
   name: 'SidebarBlockGames',
   components: {
     SidebarBlock
   },
-  props: ['items'],
   setup () {
     const router = useRouter()
     const route = useRoute()
+    const games = ref<IGame[]>([])
     const worldId = route.params.worldId
     const createGame = async () => {
-      const response = await fetch(`${API}/games`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8'
-        },
-        body: JSON.stringify({
-          planes: '',
-          sources: '',
-          notices: '',
-          story: '',
-          name: '',
-          description: '',
-          worldId
-        })
+      const game = await QueryGames.$post({
+        planes: '',
+        sources: '',
+        notices: '',
+        story: '',
+        name: '',
+        description: '',
+        worldId: +worldId
       })
-      if (!response.ok) {
-        console.log(`Ошибка HTTP: ${response.status}`)
-        return
-      }
-      const game = await response.json()
-      router.push({ name: 'games-page', params: { worldId, id: game.id } })
+      router.push({ name: 'game-page', params: { worldId, id: game.id } })
     }
+
+    const getGames = async () => {
+      games.value = await QueryGames.$getAll({ worldId: +worldId })
+    }
+
+    onMounted(() => {
+      getGames()
+    })
+
     return {
-      createGame
+      createGame,
+      games
     }
   }
 }

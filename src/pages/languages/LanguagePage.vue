@@ -17,52 +17,33 @@
   </PageLayout>
 </template>
 
-<script>
+<script lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router/dist/vue-router'
-import IconPlus from '@/components/assets/svg/IconPlus'
-import PageLayout from '@/layouts/PageLayout'
-const API = 'http://localhost:3030'
+import { ILanguage } from '@/interfaces/language'
+import IconPlus from '@/components/assets/svg/IconPlus.vue'
+import PageLayout from '@/layouts/PageLayout.vue'
+import QueryLanguages from '@/queries/language'
+
 export default {
   name: 'LanguagePage',
   components: { IconPlus, PageLayout },
   setup () {
     const name = ref('')
-    const languages = ref([])
+    const languages = ref<ILanguage[]>([])
     const route = useRoute()
     const gameId = route.params.gameId
     const worldId = route.params.worldId
 
     const getLanguage = async () => {
-      const response = await fetch(`${API}/languages?gameId=${gameId}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8'
-        }
-      })
-      if (!response.ok) {
-        console.log(`Ошибка HTTP: ${response.status}`)
-        return
-      }
-      languages.value = await response.json()
+      languages.value = await QueryLanguages.$getAll({ gameId: +gameId })
     }
 
     const createLanguage = async () => {
-      const response = await fetch(`${API}/languages`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8'
-        },
-        body: JSON.stringify({
-          name: name.value,
-          gameId
-        })
+      const date = await QueryLanguages.$post({
+        name: name.value,
+        gameId: +gameId
       })
-      if (!response.ok) {
-        console.log(`Ошибка HTTP: ${response.status}`)
-        return
-      }
-      const date = await response.json()
       languages.value.push(date)
       name.value = ''
     }

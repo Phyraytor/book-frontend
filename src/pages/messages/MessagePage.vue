@@ -1,8 +1,8 @@
 <template>
   <PageLayout>
-    <template #header>
-      <input v-if="message && isEdit" v-model="message.name" type="text" class="input__title">
-      <h1 v-if="message && !isEdit" class="title">{{ message.name || 'Имя не задано' }}</h1>
+    <template v-if="message" #header>
+      <input v-if="isEdit" v-model="message.name" type="text" class="input__title">
+      <h1 v-else class="title">{{ message.name || 'Имя не задано' }}</h1>
       <icon-save v-if="isEdit" :click="updateMessage" />
       <icon-pencil v-else :click="editMessage" />
     </template>
@@ -36,15 +36,20 @@
     </template>
   </PageLayout>
 </template>
-<script>
+<script lang="ts">
 import { useRoute, useRouter } from 'vue-router'
 import { onMounted, ref, computed } from 'vue'
+import { ILanguage } from '@/interfaces/language'
+import { IMessage } from '@/interfaces/message'
+import { INote } from '@/interfaces/note'
 import DownloadSound from '@/components/UI/DownloadSound.vue'
-import IconSave from '@/components/assets/svg/IconSave'
-import IconPencil from '@/components/assets/svg/IconPencil'
-import PageLayout from '@/layouts/PageLayout'
+import IconSave from '@/components/assets/svg/IconSave.vue'
+import IconPencil from '@/components/assets/svg/IconPencil.vue'
+import PageLayout from '@/layouts/PageLayout.vue'
+import QueryLanguages from '@/queries/language'
+import QueryMessages from '@/queries/message'
+import QueryNotes from '@/queries/note'
 
-const API = 'http://localhost:3030'
 export default {
   name: 'MessagePage',
   components: {
@@ -54,42 +59,28 @@ export default {
     PageLayout
   },
   setup () {
-    const languages = ref([])
-    const assets = ref([])
-    const message = ref(null)
-    const find = ref('')
+    const languages = ref<ILanguage[]>([])
+    const message = ref<IMessage | null>(null)
     const description = ref('')
-    const isEdit = ref(false)
+    const isEdit = ref<boolean>(false)
     const indexActiveLanguage = ref(0)
     const router = useRouter()
     const route = useRoute()
     const messageId = route.params.messageId
     const gameId = route.params.gameId
-    const stepId = route.params.stepId
     const worldId = route.params.worldId
 
     const languageId = computed(() => languages.value?.[indexActiveLanguage.value]?.id)
-    const note = computed(() => message.value?.notes?.find(note => note.language.id === languageId.value))
-    const audio = computed(() => note.value?.sound?.path && (API + note.value?.sound?.path))
-    const addAssets = (asset) => assets.value.push(asset)
-    const setActiveLanguage = (index) => {
+    const note = computed(() => message.value?.notes?.find((note: INote) => note.language.id === languageId.value))
+    const audio = computed(() => note.value?.sound?.path && (process.env.VUE_APP_API_URL + note.value?.sound?.path))
+    const setActiveLanguage = (index: number) => {
       console.log(languageId.value, note.value?.content)
       indexActiveLanguage.value = index
       description.value = note.value?.content || ''
     }
 
     const getLanguage = async () => {
-      const response = await fetch(`${API}/languages?gameId=${gameId}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8'
-        }
-      })
-      if (!response.ok) {
-        console.log(`Ошибка HTTP: ${response.status}`)
-        return
-      }
-      languages.value = await response.json()
+      languages.value = await QueryLanguages.$getAll({ gameId: +gameId })
       getMessage()
     }
 
@@ -97,9 +88,9 @@ export default {
       isEdit.value = true
     }
 
-    const uploadFile = async (formData) => {
+    const uploadFile = async (formData: FormData) => {
       if (!note.value) return
-      const response = await fetch(`${API}/notes/${note.value.id}/upload`, {
+      const response = await fetch(`${process.env.VUE_APP_API_URL}/notes/${note.value.id}/upload`, {
         method: 'POST',
         body: formData
       })
@@ -107,82 +98,41 @@ export default {
     }
 
     const getMessage = async () => {
-      const response = await fetch(`${API}/messages/${messageId}`)
-      if (!response.ok) {
-        console.log(`Ошибка HTTP: ${response.status}`)
-        return
-      }
-      message.value = await response.json()
+      message.value = await QueryMessages.$get(+messageId)
       setActiveLanguage(0)
     }
     const removeMessage = async () => {
-      const response = await fetch(`${API}/messages/${messageId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8'
-        }
-      })
-      if (!response.ok) {
-        console.log(`Ошибка HTTP: ${response.status}`)
-        return
-      }
-      router.push({ name: 'game-page', params: { id: gameId } })
+      await QueryMessages.$delete(+messageId)
+      router.push({ name: 'game-page', params: { worldId, gameId } })
     }
 
     const updateMessageName = async () => {
-      const response = await fetch(`${API}/messages/${messageId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8'
-        },
-        body: JSON.stringify({
-          name: message.value.name
-        })
+      if (!message.value) return null
+      await QueryMessages.$patch(+messageId, {
+        name: message.value.name
       })
-      if (!response.ok) {
-        console.log(`Ошибка HTTP: ${response.status}`)
-        return
-      }
       isEdit.value = false
     }
 
     const createNote = async () => {
-      const response = await fetch(`${API}/notes`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8'
-        },
-        body: JSON.stringify({
-          content: description.value,
-          messageId: message.value.id,
-          languageId: languageId.value
-        })
+      if (!message.value || !languageId.value) return null
+      const note = await QueryNotes.$post({
+        content: description.value,
+        messageId: message.value.id,
+        languageId: languageId.value
       })
-      if (!response.ok) {
-        console.log(`Ошибка HTTP: ${response.status}`)
-        return
-      }
-      message.value.notes.push(await response.json())
+      message.value.notes.push(note)
     }
 
-    const updateNote = async (noteId) => {
-      const response = await fetch(`${API}/notes/${noteId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8'
-        },
-        body: JSON.stringify({
-          content: description.value
-        })
+    const updateNote = async (noteId: number) => {
+      if (!note.value) return null
+      await QueryNotes.$patch(noteId, {
+        content: description.value
       })
-      if (!response.ok) {
-        console.log(`Ошибка HTTP: ${response.status}`)
-        return
-      }
       note.value.content = description.value
     }
 
-    const changeNote = () => {
+    const changeOrUpdateNote = () => {
       if (note.value) {
         updateNote(note.value.id)
       } else {
@@ -192,32 +142,25 @@ export default {
 
     const updateMessage = () => {
       updateMessageName()
-      changeNote()
+      changeOrUpdateNote()
     }
 
     onMounted(() => {
       getLanguage()
     })
     return {
-      changeNote,
-      indexActiveLanguage,
-      setActiveLanguage,
       languages,
-      worldId,
-      gameId,
-      stepId,
       message,
-      removeMessage,
-      assets,
       audio,
-      find,
       note,
-      addAssets,
       isEdit,
-      editMessage,
       description,
+      indexActiveLanguage,
+      removeMessage,
+      editMessage,
       uploadFile,
-      updateMessage
+      updateMessage,
+      setActiveLanguage
     }
   }
 }
@@ -235,6 +178,7 @@ export default {
   padding-left: 12px;
   height: 72px;
 }
+
 .language__item {
   padding: 12px;
   padding-right: 0;

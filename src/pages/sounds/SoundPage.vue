@@ -1,12 +1,12 @@
 <template>
   <PageLayout :remove="remove">
-    <template #header>
+    <template v-if="sound" #header>
       <input v-if="isEdit" v-model="sound.name" type="text" class="input__title">
       <h1 v-else class="title">{{ sound.name || 'Имя не задано' }}</h1>
       <icon-save v-if="isEdit" :click="updateSound" />
       <icon-pencil v-else :click="editSound" />
     </template>
-    <template #description>
+    <template v-if="sound" #description>
       <audio v-if="!isEdit && audio" controls>
         <source :src="audio" type="audio/mpeg">
         <p>Браузер не поддерживает аудио</p>
@@ -22,14 +22,15 @@
     </template>
   </PageLayout>
 </template>
-<script>
+<script lang="ts">
 import { useRoute, useRouter } from 'vue-router'
 import { computed, onMounted, ref } from 'vue'
-import IconSave from '@/components/assets/svg/IconSave'
-import IconPencil from '@/components/assets/svg/IconPencil'
-import PageLayout from '@/layouts/PageLayout'
+import { ISound } from '@/interfaces/sound'
+import IconSave from '@/components/assets/svg/IconSave.vue'
+import IconPencil from '@/components/assets/svg/IconPencil.vue'
+import PageLayout from '@/layouts/PageLayout.vue'
+import QuerySounds from '@/queries/sound'
 
-const API = 'http://localhost:3030'
 export default {
   name: 'SoundPage',
   components: {
@@ -38,74 +39,44 @@ export default {
     IconPencil
   },
   setup () {
-    const assets = ref([])
-    const sound = ref({})
-    const find = ref('')
+    const sound = ref<ISound | null>(null)
     const isEdit = ref(false)
     const route = useRoute()
     const router = useRouter()
-    const id = route.params.soundId
-    const worldId = route.params.worldId
-    const addAssets = (asset) => assets.value.push(asset)
+    const soundId = route.params.soundId
     const editSound = () => {
       isEdit.value = true
     }
-    const audio = computed(() => sound.value.path ? API + sound.value.path : '')
+    const audio = computed(() => sound.value?.path ? process.env.VUE_APP_API_URL + sound.value.path : '')
     const getSound = async () => {
-      const response = await fetch(`${API}/sounds/${id}`)
-      if (!response.ok) {
-        console.log(`Ошибка HTTP: ${response.status}`)
-        return
-      }
-      sound.value = await response.json()
+      sound.value = await QuerySounds.$get(+soundId)
     }
 
     const remove = async () => {
-      const response = await fetch(`${API}/sounds/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8'
-        }
-      })
-      if (!response.ok) {
-        console.log(`Ошибка HTTP: ${response.status}`)
-        return
-      }
+      await QuerySounds.$delete(+soundId)
       router.push({ name: 'sounds-list' })
     }
 
     const updateSound = async () => {
-      const response = await fetch(`${API}/sounds/${id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8'
-        },
-        body: JSON.stringify({
-          link: sound.value.link,
-          author: sound.value.author,
-          description: sound.value.description,
-          name: sound.value.name
-        })
+      if (!sound.value) return null
+      await QuerySounds.$patch(+soundId, {
+        link: sound.value.link,
+        author: sound.value.author,
+        description: sound.value.description,
+        name: sound.value.name
       })
-      if (!response.ok) {
-        console.log(`Ошибка HTTP: ${response.status}`)
-        return
-      }
       isEdit.value = false
     }
 
     onMounted(() => {
       getSound()
     })
+
     return {
-      remove,
       audio,
       sound,
-      worldId,
-      assets,
-      find,
-      addAssets,
       isEdit,
+      remove,
       editSound,
       updateSound
     }

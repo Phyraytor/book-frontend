@@ -1,7 +1,11 @@
 <template>
-  <icon-svg :class-name="props.className" :click="click">
-    <svg height="800px" width="800px" version="1.1" id="_x32_" xmlns="http://www.w3.org/2000/svg"
-         viewBox="0 0 512 512" xml:space="preserve">
+  <icon-svg :class-name="className" :click="click">
+    <svg
+      height="800px"
+      width="800px"
+      viewBox="0 0 512 512"
+      xml:space="preserve"
+    >
       <path class="st0" d="M511.878,247.973l-21.488,0.672l21.488-0.68c-2.168-69.219-31.732-131.348-77.876-175.949
         C387.882,27.377,324.93-0.004,256.13,0.004c-2.718,0-5.443,0.046-8.176,0.13h0.016C178.743,2.294,116.622,31.858,72.013,78.002
         C27.382,124.122,0,187.074,0,255.874c0,2.709,0.046,5.435,0.13,8.16c2.168,69.22,31.732,131.347,77.875,175.949
@@ -30,16 +34,15 @@
   </icon-svg>
 </template>
 
-<script>
-import IconSvg from './IconSvg'
+<script lang="ts">
+import IconSvg from '@/components/assets/svg/IconSvg.vue'
 
 export default {
   name: 'IconOnline',
   components: { IconSvg },
   props: ['className', 'click'],
-  setup (props) {
+  setup () {
     return {
-      props
     }
   }
 }

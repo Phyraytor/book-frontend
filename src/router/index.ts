@@ -1,20 +1,22 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import GamePage from '@/pages/games/GamePage'
-import StepPage from '@/pages/steps/StepPage'
-import PersonPage from '@/pages/persons/PersonPage'
-import AssetPage from '@/pages/assets/AssetPage'
-import AssetList from '@/pages/assets/AssetList'
-import EnemyPage from '@/pages/enemies/EnemyPage'
-import LanguagePage from '@/pages/languages/LanguagePage'
-import MessagePage from '@/pages/messages/MessagePage'
-import SubjectPage from '@/pages/subjects/SubjectPage'
-import SoundPage from '@/pages/sounds/SoundPage'
-import SoundsList from '@/pages/sounds/SoundsList'
-import SpellPage from '@/pages/spells/SpellPage'
-import WorldList from '@/pages/worlds/WorldList'
-import WorldPage from '@/pages/worlds/WorldPage'
-import TaskPage from '@/pages/tasks/TaskPage'
-import TaskList from '@/pages/tasks/TaskList'
+import GamePage from '@/pages/games/GamePage.vue'
+import StepPage from '@/pages/steps/StepPage.vue'
+import PersonPage from '@/pages/persons/PersonPage.vue'
+import AssetPage from '@/no-use/assets/AssetPage.vue'
+import AssetList from '@/no-use/assets/AssetList.vue'
+import EnemyPage from '@/pages/enemies/EnemyPage.vue'
+import LanguagePage from '@/pages/languages/LanguagePage.vue'
+import MessagePage from '@/pages/messages/MessagePage.vue'
+import SubjectPage from '@/pages/subjects/SubjectPage.vue'
+import SoundPage from '@/pages/sounds/SoundPage.vue'
+import SoundsList from '@/pages/sounds/SoundsList.vue'
+import SpellPage from '@/pages/spells/SpellPage.vue'
+import WorldPage from '@/pages/worlds/WorldPage.vue'
+import TaskPage from '@/pages/tasks/TaskPage.vue'
+import TaskList from '@/pages/tasks/TaskList.vue'
+import WorldList from '@/pages/worlds/WorldList.vue'
+import ArticlePage from '@/pages/articles/ArticlePage.vue'
+import ArticleList from '@/pages/articles/ArticleList.vue'
 
 const routes = [
   {
@@ -26,6 +28,16 @@ const routes = [
     path: '/worlds/:worldId/games/:gameId',
     name: 'games-page',
     component: GamePage
+  },
+  {
+    path: '/articles',
+    name: 'article-list',
+    component: ArticleList
+  },
+  {
+    path: '/articles/:articleId',
+    name: 'article-page',
+    component: ArticlePage
   },
   {
     path: '/worlds/:worldId/games/:gameId/tasks/:taskId',

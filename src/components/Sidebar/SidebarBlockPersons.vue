@@ -7,11 +7,12 @@
   />
 </template>
 
-<script>
-import SidebarBlock from '@/components/Sidebar/SidebarBlock'
-import { useRoute, useRouter } from 'vue-router/dist/vue-router'
+<script lang="ts">
 import { onMounted, ref } from 'vue'
-const API = 'http://localhost:3030'
+import { useRoute, useRouter } from 'vue-router/dist/vue-router'
+import QueryPersons from '@/queries/person'
+import SidebarBlock from '@/components/Sidebar/SidebarBlock.vue'
+import { IPerson } from '@/interfaces/person'
 
 export default {
   name: 'SidebarBlockPersons',
@@ -21,39 +22,24 @@ export default {
   setup () {
     const router = useRouter()
     const route = useRoute()
-    const persons = ref([])
+    const persons = ref<IPerson[]>([])
+    const worldId = route.params.worldId
     const gameId = route.params.gameId
     const createPerson = async () => {
-      const response = await fetch(`${API}/persons`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8'
-        },
-        body: JSON.stringify({
-          name: '',
-          description: '',
-          gameId
-        })
+      const person = await QueryPersons.$post({
+        name: '',
+        description: '',
+        gameId: +gameId
       })
-      if (!response.ok) {
-        console.log(`Ошибка HTTP: ${response.status}`)
-        return
-      }
-      const person = await response.json()
-      router.push({ name: 'person-page', params: { gameId, id: person.id } })
+      router.push({ name: 'person-page', params: { worldId, gameId, personId: person.id } })
     }
 
-    const getPersons = async (gameId) => {
-      const response = await fetch(`${API}/persons?gameId=${gameId}`)
-      if (!response.ok) {
-        console.log(`Ошибка HTTP: ${response.status}`)
-        return
-      }
-      persons.value = await response.json()
+    const getPersons = async (gameId: number) => {
+      persons.value = await QueryPersons.$getAll({ gameId })
     }
 
     onMounted(() => {
-      getPersons(gameId)
+      getPersons(+gameId)
     })
 
     return {

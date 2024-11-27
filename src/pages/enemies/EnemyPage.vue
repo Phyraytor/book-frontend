@@ -1,23 +1,22 @@
 <template>
   <PageLayout>
-    <template #header>
-      <input v-if="enemy && isEdit" v-model="enemy.name" type="text" class="input__title">
-      <h1 v-if="enemy && !isEdit" class="title">{{ enemy.name || 'Имя не задано' }}</h1>
+    <template v-if="enemy" #header>
+      <input v-if="isEdit" v-model="enemy.name" type="text" class="input__title">
+      <h1 v-if="!isEdit" class="title">{{ enemy.name || 'Имя не задано' }}</h1>
       <icon-save v-if="isEdit" :click="updateEnemy" />
       <icon-pencil v-else :click="editEnemy" />
     </template>
-    <template #sidebarLeft>
+    <template v-if="enemy" #sidebarLeft>
       <sidebar-block-spells :items="enemy.spells" />
     </template>
-    <template #description>
+    <template v-if="enemy" #description>
       <textarea v-if="isEdit" v-model="enemy.description" class="description textarea" />
       <div v-else class="description">
         {{ enemy.description || 'Описание не задано' }}
       </div>
     </template>
-    <template #sidebarRight>
+    <template v-if="enemy" #sidebarRight>
       <download-image
-        v-if="enemy"
         :enemy-id="enemy?.id"
         :image="image"
         :upload="uploadFile"
@@ -25,16 +24,17 @@
     </template>
   </PageLayout>
 </template>
-<script>
+<script lang="ts">
 import { useRoute, useRouter } from 'vue-router'
 import { onMounted, ref, computed } from 'vue'
-import IconSave from '@/components/assets/svg/IconSave'
-import IconPencil from '@/components/assets/svg/IconPencil'
-import DownloadImage from '@/components/UI/DownloadImage'
-import PageLayout from '@/layouts/PageLayout'
-import SidebarBlockSpells from '@/components/Sidebar/SidebarBlockSpells'
+import { IEnemy } from '@/interfaces/enemy'
+import IconSave from '@/components/assets/svg/IconSave.vue'
+import IconPencil from '@/components/assets/svg/IconPencil.vue'
+import DownloadImage from '@/components/UI/DownloadImage.vue'
+import PageLayout from '@/layouts/PageLayout.vue'
+import SidebarBlockSpells from '@/components/Sidebar/SidebarBlockSpells.vue'
+import QueryEnemies from '@/queries/enemy'
 
-const API = 'http://localhost:3030'
 export default {
   name: 'EnemyPage',
   components: {
@@ -45,44 +45,22 @@ export default {
     SidebarBlockSpells
   },
   setup () {
-    const assets = ref([])
-    const enemy = ref({})
-    const find = ref('')
-    const isEdit = ref(false)
+    const enemy = ref<IEnemy | null>(null)
+    const isEdit = ref<Boolean>(false)
     const router = useRouter()
     const route = useRoute()
-    const id = route.params.enemyId
+    const enemyId = route.params.enemyId
     const gameId = route.params.gameId
     const worldId = route.params.worldId
 
-    const image = computed(() => API + enemy.value.imagePath)
-    const addAssets = (asset) => assets.value.push(asset)
+    const image = computed(() => enemy?.value?.imagePath ? process.env.VUE_APP_API_URL + enemy.value?.imagePath : '')
     const editEnemy = () => {
       isEdit.value = true
     }
 
-    const createSpell = async () => {
-      const response = await fetch(`${API}/spells`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8'
-        },
-        body: JSON.stringify({
-          name: '',
-          description: '',
-          enemyId: id
-        })
-      })
-      if (!response.ok) {
-        console.log(`Ошибка HTTP: ${response.status}`)
-        return
-      }
-      const step = await response.json()
-      router.push({ name: 'spell-enemy-page', params: { gameId: gameId, enemyId: id, id: step.id } })
-    }
-
-    const uploadFile = async (formData) => {
-      const response = await fetch(`${API}/enemies/${enemy.value.id}/upload`, {
+    const uploadFile = async (formData: FormData) => {
+      if (!enemy.value) return null
+      const response = await fetch(`${process.env.VUE_APP_API_URL}/enemies/${enemy.value.id}/upload`, {
         method: 'POST',
         body: formData
       })
@@ -91,41 +69,18 @@ export default {
     }
 
     const getEnemy = async () => {
-      const response = await fetch(`${API}/enemies/${id}`)
-      if (!response.ok) {
-        console.log(`Ошибка HTTP: ${response.status}`)
-        return
-      }
-      enemy.value = await response.json()
+      enemy.value = await QueryEnemies.$get(+enemyId)
     }
     const removeEnemy = async () => {
-      const response = await fetch(`${API}/enemies/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8'
-        }
-      })
-      if (!response.ok) {
-        console.log(`Ошибка HTTP: ${response.status}`)
-        return
-      }
-      router.push({ name: 'game-page', params: { id: enemy.value?.game?.id } })
+      await QueryEnemies.$delete(+enemyId)
+      router.push({ name: 'game-page', params: { worldId, gameId } })
     }
     const updateEnemy = async () => {
-      const response = await fetch(`${API}/enemies/${id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8'
-        },
-        body: JSON.stringify({
-          description: enemy.value.description,
-          name: enemy.value.name
-        })
+      if (!enemy.value) return null
+      await QueryEnemies.$patch(+enemyId, {
+        description: enemy.value.description,
+        name: enemy.value.name
       })
-      if (!response.ok) {
-        console.log(`Ошибка HTTP: ${response.status}`)
-        return
-      }
       isEdit.value = false
     }
 
@@ -133,20 +88,13 @@ export default {
       getEnemy()
     })
     return {
-      id,
-      worldId,
-      gameId,
       enemy,
-      removeEnemy,
-      createSpell,
-      assets,
       image,
-      find,
-      addAssets,
       isEdit,
+      removeEnemy,
       editEnemy,
-      uploadFile,
-      updateEnemy
+      updateEnemy,
+      uploadFile
     }
   }
 }

@@ -16,19 +16,18 @@
     <create-asset-from :append="append" />
   </div>
 </template>
-<script>
+<script lang="ts">
 import { onMounted, ref } from 'vue'
-import CreateAssetFrom from '@/components/CreateAssetFrom.vue'
-const API = 'http://localhost:3030'
+import CreateAssetFrom from '@/no-use/CreateAssetFrom.vue'
 export default {
   name: 'StepPage',
   components: {
     CreateAssetFrom
   },
   setup () {
-    const assets = ref({})
+    const assets = ref<any>([])
     const getAssets = async () => {
-      const response = await fetch(`${API}/assets`)
+      const response = await fetch(`${process.env.VUE_APP_API_URL}/assets`)
       if (!response.ok) {
         console.log(`Ошибка HTTP: ${response.status}`)
         return
@@ -36,7 +35,7 @@ export default {
       assets.value = await response.json()
     }
 
-    const append = (asset) => {
+    const append = (asset: any) => {
       assets.value.push(asset)
     }
     onMounted(() => {
