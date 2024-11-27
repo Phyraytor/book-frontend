@@ -3,7 +3,7 @@
     <template v-if="game" #header>
       <input v-if="isEdit" v-model="game.name" type="text" class="input__title">
       <h1 v-else class="title">{{ game.name || 'Имя не задано' }}</h1>
-      <div class="buttons">
+      <div class="game__buttons">
         <icon-mobile :class-name="game.isMobile ? 'icon__active' : ''" :click="toggleMobile" />
         <icon-online :class-name="game.isOnline ? 'icon__active' : ''" :click="toggleOnline" />
         <router-link :to="`/worlds/${worldId}/games/${gameId}/languages`">
@@ -20,11 +20,11 @@
     </template>
     <template #description>
       <div class="tabs">
-        <div :class="`tabs__item ${tab === 0 ? 'tabs__itemActive' : ''}`" @click="changeTab(0)">Описание</div>
-        <div :class="`tabs__item ${tab === 1 ? 'tabs__itemActive' : ''}`" @click="changeTab(1)">Планы</div>
-        <div :class="`tabs__item ${tab === 2 ? 'tabs__itemActive' : ''}`" @click="changeTab(2)">Сюжет</div>
-        <div :class="`tabs__item ${tab === 3 ? 'tabs__itemActive' : ''}`" @click="changeTab(3)">Источники</div>
-        <div :class="`tabs__item ${tab === 4 ? 'tabs__itemActive' : ''}`" @click="changeTab(4)">Заметки</div>
+        <div :class="`tabs__item ${tab === 0 ? 'tabs__item--active' : ''}`" @click="changeTab(0)">Описание</div>
+        <div :class="`tabs__item ${tab === 1 ? 'tabs__item--active' : ''}`" @click="changeTab(1)">Планы</div>
+        <div :class="`tabs__item ${tab === 2 ? 'tabs__item--active' : ''}`" @click="changeTab(2)">Сюжет</div>
+        <div :class="`tabs__item ${tab === 3 ? 'tabs__item--active' : ''}`" @click="changeTab(3)">Источники</div>
+        <div :class="`tabs__item ${tab === 4 ? 'tabs__item--active' : ''}`" @click="changeTab(4)">Заметки</div>
       </div>
       <template v-if="game">
         <template v-if="isEdit">
@@ -166,14 +166,22 @@ export default {
   }
 }
 </script>
-<style scoped>
-  .icon__active path {
-    fill: #3eaf7c;
-    stroke: #3eaf7c;
+<style scoped lang="scss">
+  .game__buttons {
+    display: flex;
+    cursor: pointer;
+    justify-content: flex-end;
   }
 
-  .icon__active rect {
-    stroke: #3eaf7c;
+  .icon__active {
+    & path {
+      fill: #3eaf7c;
+      stroke: #3eaf7c;
+    }
+
+    & rect {
+      stroke: #3eaf7c;
+    }
   }
 
   .tabs {
@@ -181,27 +189,27 @@ export default {
     display: flex;
     text-align: center;
     width: 100%;
-  }
 
-  .tabs__item {
-    flex: 0 0 calc(calc(100% / 5) - 1px);
-    border-right: 1px solid #e7e8ec;
-    padding: 12px 0;
-    cursor: pointer;
-    transition: 0.3s;
-  }
+    &__item {
+      flex: 0 0 calc(calc(100% / 5) - 1px);
+      border-right: 1px solid #e7e8ec;
+      padding: 12px 0;
+      cursor: pointer;
+      transition: 0.3s;
 
-  .tabs__item:hover {
-    background: #303841;
-    color: #fff;
-  }
+      &--active {
+        background: #303841;
+        color: #fff;
+      }
 
-  .tabs__itemActive {
-    background: #303841;
-    color: #fff;
-  }
+      &:hover {
+        background: #303841;
+        color: #fff;
+      }
 
-  .tabs__item:last-of-type {
-    border-right: none;
+      &:last-of-type {
+        border-right: none;
+      }
+    }
   }
 </style>

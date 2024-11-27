@@ -7,7 +7,7 @@
       <div class="header__content">
         <slot name="header" />
       </div>
-      <div class="buttons sidebar">
+      <div class="header__buttons sidebar">
         <icon-remove v-if="remove" :click="remove"  />
       </div>
     </header>
@@ -42,20 +42,24 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
   .header {
     height: 72px;
     border-bottom: 1px solid #e7e8ec;
     display: flex;
     justify-content: space-between;
-  }
-
-  .header__content {
-    display: flex;
-    align-items: center;
-    min-width: 1000px;
-    max-width: 1000px;
-    margin: 0 auto;
+    &__content {
+      display: flex;
+      align-items: center;
+      min-width: 1000px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    &__buttons {
+      display: flex;
+      cursor: pointer;
+      justify-content: flex-end;
+    }
   }
 
   .main {

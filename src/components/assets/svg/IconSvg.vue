@@ -15,7 +15,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 .icon {
   cursor: pointer;
   width: 24px;

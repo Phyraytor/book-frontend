@@ -48,7 +48,7 @@ export default {
   }
 }
 </script>
-<style>
+<style lang="scss">
 .assets {
   display: flex;
 }

@@ -34,7 +34,7 @@ export default {
   }
 }
 </script>
-<style>
+<style lang="scss">
 .audio {
   width: 100%;
   height: auto;

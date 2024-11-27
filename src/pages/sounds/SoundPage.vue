@@ -83,7 +83,7 @@ export default {
   }
 }
 </script>
-<style>
+<style lang="scss">
 .input__sound {
   margin: 0;
   font-size: 18px;

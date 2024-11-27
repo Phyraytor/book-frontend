@@ -148,7 +148,7 @@ export default {
   }
 }
 </script>
-<style>
+<style lang="scss">
   .absent svg path {
     fill: #8a0000;
   }

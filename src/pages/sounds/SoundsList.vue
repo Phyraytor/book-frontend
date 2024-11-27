@@ -1,35 +1,30 @@
 <template>
-  <div class="head">
-    <div class="content head__content">
+  <PageLayout>
+    <template #header>
       <h1 class="title">Список аудио</h1>
-      <icon-plus :click="createSound" />
-    </div>
-  </div>
-  <div class="items">
-    <ul class="items-list">
-      <li
-        v-for="(sound, index) in sounds"
-        class="items-list__item"
-        :key="sound.id"
-      >
-        <router-link class="items-list__link" :to="`/sounds/${sound.id}`">
-          <span class="items-index">{{ index + 1 }}</span>
-          <span class="items-text">{{ sound.name }}</span>
-        </router-link>
-      </li>
-    </ul>
-  </div>
+      <icon-plus :click="createSound"/>
+    </template>
+    <template #description>
+      <numbered-list
+        :items="sounds"
+        :getLink="(soundId) => `/sounds/${soundId}`"
+        fieldName="name"
+      />
+    </template>
+  </PageLayout>
 </template>
 <script lang="ts">
 import { ref, onMounted } from 'vue'
-import IconPlus from '@/components/assets/svg/IconPlus.vue'
 import { useRouter } from 'vue-router/dist/vue-router'
-import QuerySounds from '@/queries/sound'
 import { ISound } from '@/interfaces/sound'
+import IconPlus from '@/components/assets/svg/IconPlus.vue'
+import QuerySounds from '@/queries/sound'
+import PageLayout from '@/layouts/PageLayout.vue'
+import NumberedList from '@/components/UI/NumberedList.vue'
 
 export default {
   name: 'SoundList',
-  components: { IconPlus },
+  components: { IconPlus, PageLayout, NumberedList },
   setup () {
     const router = useRouter()
     const sounds = ref<ISound[]>([])
@@ -61,5 +56,5 @@ export default {
   }
 }
 </script>
-<style>
+<style lang="scss">
 </style>

@@ -14,7 +14,7 @@
         <li
           v-for="(language, index) in languages"
           :key="language.id"
-          :class="`language__item ${index === indexActiveLanguage ? 'language__itemActive' : ''}`"
+          :class="`language__item ${index === indexActiveLanguage ? 'language__item--active' : ''}`"
           @click="setActiveLanguage(index)"
         >
           <span>{{ language.name }}</span>
@@ -74,7 +74,6 @@ export default {
     const note = computed(() => message.value?.notes?.find((note: INote) => note.language.id === languageId.value))
     const audio = computed(() => note.value?.sound?.path && (process.env.VUE_APP_API_URL + note.value?.sound?.path))
     const setActiveLanguage = (index: number) => {
-      console.log(languageId.value, note.value?.content)
       indexActiveLanguage.value = index
       description.value = note.value?.content || ''
     }
@@ -165,35 +164,37 @@ export default {
   }
 }
 </script>
-<style>
-.language__title {
-  border-bottom: 1px solid #e7e8ec;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0;
-  font-size: 18px;
-  font-weight: bold;
-  gap: 12px;
-  padding-left: 12px;
-  height: 72px;
-}
+<style lang="scss" scoped>
+  .language {
+    &__title {
+      border-bottom: 1px solid #e7e8ec;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0;
+      font-size: 18px;
+      font-weight: bold;
+      gap: 12px;
+      padding-left: 12px;
+      height: 72px;
+    }
 
-.language__item {
-  padding: 12px;
-  padding-right: 0;
-  border-bottom: 1px solid #e7e8ec;
-  cursor: pointer;
-}
+    &__item {
+      padding: 12px;
+      padding-right: 0;
+      border-bottom: 1px solid #e7e8ec;
+      cursor: pointer;
 
-.language__item:hover {
-  background: #303841;
-  color: #fff;
-}
+      &--active {
+        background: #303841;
+        color: #fff;
+        cursor: default;
+      }
 
-.language__itemActive {
-  background: #303841;
-  color: #fff;
-  cursor: default;
-}
+      &:hover {
+        background: #303841;
+        color: #fff;
+      }
+    }
+  }
 </style>

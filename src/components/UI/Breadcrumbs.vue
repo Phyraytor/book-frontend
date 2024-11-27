@@ -5,7 +5,7 @@
       <span class="breadcrumbs__next">></span>
     </li>
   </ul>
-  <router-link v-if="!items.length && !isHome" to="/" class="back task__persons">
+  <router-link v-if="!items.length && !isHome" to="/">
     <icon-back />
   </router-link>
 </template>
@@ -55,26 +55,24 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
   .breadcrumbs {
     display: flex;
     align-items: center;
     height: 100%;
     padding: 0 16px;
     font-size: 18px;
-  }
-  .breadcrumbs__next {
-    margin: 0 4px;
-  }
-  .breadcrumbs__item:last-child .breadcrumbs__next {
-    display: none;
-  }
-
-  .breadcrumbs__link {
-    transition: 0.3s;
-  }
-
-  .breadcrumbs__link:hover {
-    color: rgb(38, 64, 89);
+    &__next {
+      margin: 0 4px;
+    }
+    &__link {
+      transition: 0.3s;
+      &:hover {
+        color: rgb(38, 64, 89);
+      }
+    }
+    &__item:last-child .breadcrumbs__next {
+      display: none;
+    }
   }
 </style>

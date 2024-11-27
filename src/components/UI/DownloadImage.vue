@@ -1,6 +1,6 @@
 <template>
   <img class="image" :src="image" alt="Загрузить изображание" @click="openUploader" />
-  <input type="file" class="input" @change="onFileChange" ref="inputRef" />
+  <input type="file" class="hidden" @change="onFileChange" ref="inputRef" />
 </template>
 <script lang="ts">
 import { ref } from 'vue'
@@ -39,7 +39,7 @@ export default {
     color: #fff;
   }
 
-  .input {
+  .hidden {
     display: none;
   }
 </style>

@@ -63,48 +63,52 @@ export default {
 }
 </script>
 
-<style scoped>
-  .language__list {
-    white-space: pre-line;
-    text-align: left;
-    min-height: calc(100vh - 97px);
-    font-size: 16px;
-    width: 100%;
-    resize: none;
-    border: none;
-    font-family: Georgia, serif;
-    margin: 0;
-  }
-  .language__form {
-    display: flex;
-    height: 72px;
-    width: 100%;
-    border-bottom: 1px solid #e7e8ec;
-  }
+<style scoped lang="scss">
+  .language {
 
-  .language__input {
-    height: 72px;
-    margin: 0;
-    font-size: 18px;
-    border: none;
-    font-weight: 600;
-    font-family: Georgia, serif;
-    flex-grow: 1;
-    padding: 0 12px;
-    background: #303841;
-    color: #fff;
-  }
+    &__list {
+      white-space: pre-line;
+      text-align: left;
+      min-height: calc(100vh - 97px);
+      font-size: 16px;
+      width: 100%;
+      resize: none;
+      border: none;
+      font-family: Georgia, serif;
+      margin: 0;
+    }
 
-  .language__item {
-    color: #000;
-    text-decoration: none;
-    width: calc(100% - 24px);
-    transition: 0.3s;
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    border-bottom: 1px solid #e7e8ec;
-    padding: 24px 12px;
-    font-size: 18px;
+    &__form {
+      display: flex;
+      height: 72px;
+      width: 100%;
+      border-bottom: 1px solid #e7e8ec;
+    }
+
+    &__input {
+      height: 72px;
+      margin: 0;
+      font-size: 18px;
+      border: none;
+      font-weight: 600;
+      font-family: Georgia, serif;
+      flex-grow: 1;
+      padding: 0 12px;
+      background: #303841;
+      color: #fff;
+    }
+
+    &__item {
+      color: #000;
+      text-decoration: none;
+      width: calc(100% - 24px);
+      transition: 0.3s;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      border-bottom: 1px solid #e7e8ec;
+      padding: 24px 12px;
+      font-size: 18px;
+    }
   }
 </style>

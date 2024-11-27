@@ -112,7 +112,6 @@ export default {
             room !== rooms.value[i] && room.left <= rooms.value[i].left + rooms.value[i].width
           ).map(room => room.left)
       ) || 0
-      console.log('minLeft', minLeft, getCollisions(rooms.value[i]))
       rooms.value[i].left = WIDTH - (rooms.value[i].width + minLeft)
     }
     const moveItemTop = (i: any) => {
@@ -140,7 +139,7 @@ export default {
   }
 }
 </script>
-<style>
+<style lang="scss">
   .step {
     background: #fff;
     padding: 16px;

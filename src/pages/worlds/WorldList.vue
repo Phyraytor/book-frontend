@@ -2,43 +2,33 @@
   <PageLayout>
     <template #header>
       <h1 class="title">Список миров</h1>
-      <router-link to="/articles">Статьи</router-link>
+      <router-link to="/articles">
+        <icon-article />
+      </router-link>
       <icon-plus :click="createWorld" />
     </template>
     <template #description>
-      <div class="items">
-        <ul class="items-list">
-          <li
-            v-for="(world, index) in worlds"
-            class="items-list__item"
-            :key="world.id"
-          >
-            <router-link class="items-list__link" :to="`/worlds/${world.id}`">
-              <span class="items-index">{{ index + 1 }}</span>
-              <span class="items-text">{{ world.name }}</span>
-              <div class="buttons">
-                <icon-mobile v-if="world.isMobile" :click="createWorld" />
-                <icon-online v-if="world.isOnline" :click="createWorld" />
-              </div>
-            </router-link>
-          </li>
-        </ul>
-      </div>
+      <numbered-list
+        :items="worlds"
+        :getLink="(worldId) => `/worlds/${worldId}`"
+        fieldName="name"
+      />
     </template>
   </PageLayout>
 </template>
 <script lang="ts">
 import { ref, onMounted } from 'vue'
 import IconPlus from '@/components/assets/svg/IconPlus.vue'
-import IconOnline from '@/components/assets/svg/IconOnline.vue'
-import IconMobile from '@/components/assets/svg/IconMobile.vue'
 import QueryWorlds from '@/queries/world'
 import PageLayout from '@/layouts/PageLayout.vue'
+import NumberedList from '@/components/UI/NumberedList.vue'
+import IconArticle from '@/components/assets/svg/IconArticle.vue'
 import { useRouter } from 'vue-router/dist/vue-router'
 import { IWorld } from '@/interfaces/world'
+
 export default {
   name: 'WorldList',
-  components: { IconPlus, IconOnline, IconMobile, PageLayout },
+  components: { IconPlus, PageLayout, NumberedList, IconArticle },
   setup () {
     const router = useRouter()
     const worlds = ref<IWorld[]>([])
@@ -65,5 +55,5 @@ export default {
   }
 }
 </script>
-<style>
+<style lang="scss">
 </style>

@@ -1,4 +1,4 @@
-abstract class Logger {
+export abstract class Logger {
   public log (messages: any[]): void {
     console.log(...messages)
   }

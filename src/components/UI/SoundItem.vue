@@ -18,7 +18,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .link {
   display: flex;
   align-items: center;
@@ -29,10 +29,10 @@ export default {
   height: 40px;
   justify-content: flex-end;
   padding-right: 16px;
-}
 
-.link :hover {
-  background: #303841;
-  color: #fff;
+  &:hover {
+    background: #303841;
+    color: #fff;
+  }
 }
 </style>
