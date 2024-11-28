@@ -11,7 +11,8 @@ export interface ISpell {
 }
 
 export interface ISpellFind {
-  gameId?: number;
+  personId?: number;
+  enemyId?: number;
 }
 
 export interface ISpellCreate {

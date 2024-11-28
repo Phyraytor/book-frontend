@@ -6,8 +6,8 @@
       <icon-save v-if="isEdit" :click="updatePerson" />
       <icon-pencil v-else :click="editPerson" />
     </template>
-    <template v-if="person" #sidebarLeft>
-      <sidebar-block-spells :items="person.spells" />
+    <template v-if="spells" #sidebarLeft>
+      <sidebar-block-spells :items="spells" />
     </template>
     <template v-if="person" #description>
       <textarea v-if="isEdit" v-model="person.description" class="description textarea" />
@@ -21,11 +21,13 @@
 import { useRoute, useRouter } from 'vue-router'
 import { onMounted, ref } from 'vue'
 import { IPerson } from '@/interfaces/person'
+import { ISpell } from '@/interfaces/spell'
 import IconSave from '@/components/assets/svg/IconSave.vue'
 import IconPencil from '@/components/assets/svg/IconPencil.vue'
 import PageLayout from '@/layouts/PageLayout.vue'
 import SidebarBlockSpells from '@/components/Sidebar/SidebarBlockSpells.vue'
 import QueryPersons from '@/queries/person'
+import QuerySpells from '@/queries/spell'
 
 export default {
   name: 'PersonPage',
@@ -39,6 +41,7 @@ export default {
     const router = useRouter()
     const route = useRoute()
     const person = ref<IPerson | null>(null)
+    const spells = ref<ISpell[]>([])
     const isEdit = ref(false)
     const personId = route.params.personId
     const worldId = route.params.worldId
@@ -46,13 +49,20 @@ export default {
     const editPerson = () => {
       isEdit.value = true
     }
+
     const getPerson = async () => {
       person.value = await QueryPersons.$get(+personId)
     }
+
+    const getSpells = async () => {
+      spells.value = await QuerySpells.$getAll({ personId: +personId })
+    }
+
     const removePerson = async () => {
       await QueryPersons.$delete(+personId)
       router.push({ name: 'game-page', params: { worldId, gameId } })
     }
+
     const updatePerson = async () => {
       if (!person.value) return null
       await QueryPersons.$patch(+personId, {
@@ -64,8 +74,11 @@ export default {
 
     onMounted(() => {
       getPerson()
+      getSpells()
     })
+
     return {
+      spells,
       person,
       isEdit,
       removePerson,

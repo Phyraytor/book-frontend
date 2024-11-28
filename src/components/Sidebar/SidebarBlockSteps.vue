@@ -4,7 +4,7 @@
     type="steps"
     :create="createStep"
     :items="steps"
-    :updateStepOrder="updateStepOrder"
+    :update-item-order-by="updateStepOrder"
   />
 </template>
 

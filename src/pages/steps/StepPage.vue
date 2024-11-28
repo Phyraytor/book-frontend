@@ -6,7 +6,7 @@
       <icon-save v-if="isEdit" :click="update" />
       <icon-pencil v-else :click="edit" />
     </template>
-    <template #sidebarLeft>
+    <template v-if="step" #sidebarLeft>
       <sidebar-block-messages :items="step.messages"/>
     </template>
     <template v-if="step" #description>

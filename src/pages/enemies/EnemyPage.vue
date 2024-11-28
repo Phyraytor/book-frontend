@@ -6,8 +6,8 @@
       <icon-save v-if="isEdit" :click="updateEnemy" />
       <icon-pencil v-else :click="editEnemy" />
     </template>
-    <template v-if="enemy" #sidebarLeft>
-      <sidebar-block-spells :items="enemy.spells" />
+    <template v-if="spells" #sidebarLeft>
+      <sidebar-block-spells :items="spells" />
     </template>
     <template v-if="enemy" #description>
       <textarea v-if="isEdit" v-model="enemy.description" class="description textarea" />
@@ -28,12 +28,14 @@
 import { useRoute, useRouter } from 'vue-router'
 import { onMounted, ref, computed } from 'vue'
 import { IEnemy } from '@/interfaces/enemy'
+import { ISpell } from '@/interfaces/spell'
 import IconSave from '@/components/assets/svg/IconSave.vue'
 import IconPencil from '@/components/assets/svg/IconPencil.vue'
 import DownloadImage from '@/components/UI/DownloadImage.vue'
 import PageLayout from '@/layouts/PageLayout.vue'
 import SidebarBlockSpells from '@/components/Sidebar/SidebarBlockSpells.vue'
 import QueryEnemies from '@/queries/enemy'
+import QuerySpells from '@/queries/spell'
 
 export default {
   name: 'EnemyPage',
@@ -46,6 +48,7 @@ export default {
   },
   setup () {
     const enemy = ref<IEnemy | null>(null)
+    const spells = ref<ISpell[]>([])
     const isEdit = ref<Boolean>(false)
     const router = useRouter()
     const route = useRoute()
@@ -71,6 +74,11 @@ export default {
     const getEnemy = async () => {
       enemy.value = await QueryEnemies.$get(+enemyId)
     }
+
+    const getSpells = async () => {
+      spells.value = await QuerySpells.$getAll({ enemyId: +enemyId })
+    }
+
     const removeEnemy = async () => {
       await QueryEnemies.$delete(+enemyId)
       router.push({ name: 'game-page', params: { worldId, gameId } })
@@ -86,8 +94,10 @@ export default {
 
     onMounted(() => {
       getEnemy()
+      getSpells()
     })
     return {
+      spells,
       enemy,
       image,
       isEdit,
