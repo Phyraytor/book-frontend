@@ -27,8 +27,11 @@ export default {
   padding: 12px;
   border-bottom: 1px solid #e7e8ec;
   height: 40px;
-  justify-content: flex-end;
+  justify-content: flex-start;
   padding-right: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 
   &:hover {
     background: #303841;

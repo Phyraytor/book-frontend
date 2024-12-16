@@ -33,6 +33,7 @@
     </template>
     <template #sidebarRight>
       <download-sound v-if="note" :audio="audio" :upload="uploadFile" />
+      <download-image v-if="note" :image="image" :upload="uploadImageFile" />
     </template>
   </PageLayout>
 </template>
@@ -49,10 +50,12 @@ import PageLayout from '@/layouts/PageLayout.vue'
 import QueryLanguages from '@/queries/language'
 import QueryMessages from '@/queries/message'
 import QueryNotes from '@/queries/note'
+import DownloadImage from '@/components/UI/DownloadImage.vue'
 
 export default {
   name: 'MessagePage',
   components: {
+    DownloadImage,
     DownloadSound,
     IconSave,
     IconPencil,
@@ -73,6 +76,7 @@ export default {
     const languageId = computed(() => languages.value?.[indexActiveLanguage.value]?.id)
     const note = computed(() => message.value?.notes?.find((note: INote) => note.language.id === languageId.value))
     const audio = computed(() => note.value?.sound?.path && (process.env.VUE_APP_API_URL + note.value?.sound?.path))
+    const image = computed(() => note.value?.imagePath && (process.env.VUE_APP_API_URL + note.value?.imagePath))
     const setActiveLanguage = (index: number) => {
       indexActiveLanguage.value = index
       description.value = note.value?.content || ''
@@ -94,6 +98,16 @@ export default {
         body: formData
       })
       note.value.sound = await response.json()
+    }
+
+    const uploadImageFile = async (formData: FormData) => {
+      if (!note.value) return
+      const response = await fetch(`${process.env.VUE_APP_API_URL}/notes/${note.value.id}/upload-image`, {
+        method: 'POST',
+        body: formData
+      })
+      const data = await response.json()
+      note.value.imagePath = data.path
     }
 
     const getMessage = async () => {
@@ -151,6 +165,7 @@ export default {
       languages,
       message,
       audio,
+      image,
       note,
       isEdit,
       description,
@@ -158,6 +173,7 @@ export default {
       removeMessage,
       editMessage,
       uploadFile,
+      uploadImageFile,
       updateMessage,
       setActiveLanguage
     }
