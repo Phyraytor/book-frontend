@@ -7,18 +7,21 @@ export interface ISpell {
   imagePath: string;
   linkAnimation: string;
   linkParticleSystem: string;
-  sound: ISound;
+  sounds: ISound[];
 }
 
 export interface ISpellFind {
   personId?: number;
   enemyId?: number;
+  subjectId?: number;
 }
 
 export interface ISpellCreate {
   name: string;
   description: string;
-  gameId: number;
+  personId?: number;
+  enemyId?: number;
+  subjectId?: number;
 }
 
 export interface ISpellUpdate {

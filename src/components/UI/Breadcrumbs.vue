@@ -29,7 +29,8 @@ export default {
       persons: 'Персонаж',
       spells: 'Умение',
       steps: 'Шаг',
-      articles: 'Статьи'
+      articles: 'Статьи',
+      subjects: 'Предмет'
     }
     const path = window.location.pathname.split('/').filter(x => x)
     const isHome = computed(() => window.location.pathname === '/')

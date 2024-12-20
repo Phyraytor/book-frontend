@@ -30,12 +30,7 @@
 import IconPlus from '@/components/assets/svg/IconPlus.vue'
 import { IStep } from '@/interfaces/step'
 import { ref, watch } from 'vue'
-
-interface ISidebarItem {
-  id: number;
-  name: string;
-  orderBy: number;
-}
+import { ISidebarItem } from '@/interfaces/sidebar'
 
 export default {
   name: 'SidebarBlock',

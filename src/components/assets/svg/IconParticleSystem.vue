@@ -17,7 +17,7 @@
 import IconSvg from '@/components/assets/svg/IconSvg.vue'
 
 export default {
-  name: 'IconAnimation',
+  name: 'IconParticleSystem',
   components: { IconSvg },
   props: ['className', 'click'],
   setup () {

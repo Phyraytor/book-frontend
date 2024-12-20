@@ -18,7 +18,23 @@
       <icon-pencil v-else :click="editSpell" />
     </template>
     <template v-if="spell" #sidebarLeft>
-      <download-sound :audio="audio" :upload="uploadFile" />
+      <ul class="step-sounds">
+        <li
+          v-for="sound in spell.sounds"
+          :key="sound.id"
+          class="step-sounds__item"
+        >
+          <sound-item
+            :id="sound.id"
+            :name="sound.name"
+            :path="getSound(sound.path)"
+          />
+        </li>
+      </ul>
+      <download-sound
+        v-if="spell"
+        :upload="uploadFile"
+      />
     </template>
 
     <template v-if="spell" #description>
@@ -27,8 +43,9 @@
         {{ spell.description || 'Описание не задано' }}
       </div>
     </template>
+
     <template v-if="spell" #sidebarRight>
-      <download-image :audio="image" :upload="uploadFile" />
+      <download-image :image="image" :upload="uploadFile" />
     </template>
   </PageLayout>
 </template>
@@ -46,6 +63,8 @@ import QuerySpells from '@/queries/spell'
 import QueryTasks from '@/queries/task'
 import { ISpell } from '@/interfaces/spell'
 import { ETaskTypes } from '@/interfaces/task'
+import { getSound } from '@/utils/data'
+import SoundItem from '@/components/UI/SoundItem.vue'
 
 export default {
   name: 'SpellPage',
@@ -56,7 +75,8 @@ export default {
     IconSave,
     IconPencil,
     IconParticleSystem,
-    IconAnimation
+    IconAnimation,
+    SoundItem
   },
   setup () {
     const spell = ref<ISpell | null>(null)
@@ -67,9 +87,9 @@ export default {
     const worldId = route.params.worldId
     const gameId = route.params.gameId
     const personId = route.params.personId
+    const subjectId = route.params.subjectId
     const enemyId = route.params.enemyId
 
-    const audio = computed(() => spell.value?.sound?.path && (process.env.VUE_APP_API_URL + spell.value?.sound?.path))
     const image = computed(() => spell.value?.imagePath && (process.env.VUE_APP_API_URL + spell.value?.imagePath))
 
     const navigateBackPage = () => {
@@ -78,6 +98,9 @@ export default {
       }
       if (enemyId) {
         router.push({ name: 'enemy-page', params: { worldId, gameId, id: enemyId } })
+      }
+      if (subjectId) {
+        router.push({ name: 'subject-page', params: { worldId, gameId, id: subjectId } })
       }
     }
 
@@ -91,7 +114,7 @@ export default {
         method: 'POST',
         body: formData
       })
-      spell.value.sound = await response.json()
+      spell.value.sounds.push(await response.json())
     }
 
     const getSpell = async () => {
@@ -136,14 +159,14 @@ export default {
     return {
       ETaskTypes,
       image,
-      audio,
       spell,
       isEdit,
       createTask,
       removeSpell,
       uploadFile,
       editSpell,
-      updateSpell
+      updateSpell,
+      getSound
     }
   }
 }
@@ -151,5 +174,11 @@ export default {
 <style lang="scss">
   .absent svg path {
     fill: #8a0000;
+  }
+
+  .step-sounds__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
 </style>

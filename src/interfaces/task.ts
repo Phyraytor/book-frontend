@@ -1,6 +1,7 @@
 export enum ETaskTypes {
   ANIMATION = 'ANIMATION',
-  PARTICLE_SYSTEM = 'PARTICLE_SYSTEM'
+  PARTICLE_SYSTEM = 'PARTICLE_SYSTEM',
+  MODEL = 'MODEL'
 }
 
 export interface ITask {

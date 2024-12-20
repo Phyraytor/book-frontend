@@ -45,7 +45,6 @@
 import { useRoute, useRouter } from 'vue-router'
 import { computed, onMounted, ref } from 'vue'
 import { IStep } from '@/interfaces/step'
-import { ISound } from '@/interfaces/sound'
 import IconSave from '@/components/assets/svg/IconSave.vue'
 import IconPencil from '@/components/assets/svg/IconPencil.vue'
 import DownloadImage from '@/components/UI/DownloadImage.vue'
@@ -54,6 +53,7 @@ import PageLayout from '@/layouts/PageLayout.vue'
 import SidebarBlockMessages from '@/components/Sidebar/SidebarBlockMessages.vue'
 import QuerySteps from '@/queries/step'
 import SoundItem from '@/components/UI/SoundItem.vue'
+import { getSound } from '@/utils/data'
 
 export default {
   name: 'StepPage',
@@ -78,8 +78,6 @@ export default {
     const edit = () => {
       isEdit.value = true
     }
-
-    const getSound = (sound: ISound) => sound ? process.env.VUE_APP_API_URL + sound : ''
 
     const uploadFile = async (formData: FormData) => {
       if (!step.value) return null
@@ -138,9 +136,9 @@ export default {
 }
 </script>
 <style scoped>
-  .step-sounds__item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
+.step-sounds__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 </style>

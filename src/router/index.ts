@@ -100,6 +100,11 @@ const routes = [
     component: SpellPage
   },
   {
+    path: '/worlds/:worldId/games/:gameId/subjects/:subjectId/spells/:spellId',
+    name: 'spell-subject-page',
+    component: SpellPage
+  },
+  {
     path: '/worlds/:worldId/games/:gameId/enemies/:enemyId',
     name: 'enemy-page',
     component: EnemyPage

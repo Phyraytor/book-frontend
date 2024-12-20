@@ -5,6 +5,7 @@ export interface ISubject {
   sound: ISound;
   name: string;
   description: string;
+  modelLink?: string;
 }
 
 export interface ISubjectFind {
@@ -18,4 +19,5 @@ export interface ISubjectCreate {
 export interface ISubjectUpdate {
   name?: string;
   description?: string;
+  modelLink?: string;
 }
