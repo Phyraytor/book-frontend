@@ -30,7 +30,8 @@ export default {
       spells: 'Умение',
       steps: 'Шаг',
       articles: 'Статьи',
-      subjects: 'Предмет'
+      subjects: 'Предмет',
+      assets: 'Ассеты'
     }
     const path = window.location.pathname.split('/').filter(x => x)
     const isHome = computed(() => window.location.pathname === '/')

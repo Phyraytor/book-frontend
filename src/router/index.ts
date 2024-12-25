@@ -2,8 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import GamePage from '@/pages/games/GamePage.vue'
 import StepPage from '@/pages/steps/StepPage.vue'
 import PersonPage from '@/pages/persons/PersonPage.vue'
-import AssetPage from '@/no-use/assets/AssetPage.vue'
-import AssetList from '@/no-use/assets/AssetList.vue'
+import AssetPage from '@/pages/assets/AssetPage.vue'
 import EnemyPage from '@/pages/enemies/EnemyPage.vue'
 import LanguagePage from '@/pages/languages/LanguagePage.vue'
 import MessagePage from '@/pages/messages/MessagePage.vue'
@@ -17,6 +16,7 @@ import TaskList from '@/pages/tasks/TaskList.vue'
 import WorldList from '@/pages/worlds/WorldList.vue'
 import ArticlePage from '@/pages/articles/ArticlePage.vue'
 import ArticleList from '@/pages/articles/ArticleList.vue'
+import AssetList from '@/pages/assets/AssetList.vue'
 
 const routes = [
   {
@@ -110,7 +110,7 @@ const routes = [
     component: EnemyPage
   },
   {
-    path: '/worlds/:worldId/assets',
+    path: '/assets',
     name: 'assets',
     component: AssetList
   },
@@ -120,6 +120,7 @@ const routes = [
     component: AssetPage
   }
 ]
+
 export default createRouter({
   history: createWebHistory(),
   routes
